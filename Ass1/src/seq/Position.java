@@ -1,4 +1,4 @@
-package pcd.ass01.seq;
+package src.seq;
 
 public class Position { 
 
