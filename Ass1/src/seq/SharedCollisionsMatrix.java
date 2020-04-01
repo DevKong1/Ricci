@@ -46,7 +46,8 @@ public class SharedCollisionsMatrix {
 		if(!r2) {
 			matrix.get(ball2).set(ball1, true);			
 		}
-		
+
+		notifyAll();
 		return result;
 	}
 }
