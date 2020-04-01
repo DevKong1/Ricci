@@ -19,7 +19,7 @@ public class BouncingBalls {
 		List<Worker> workers = new ArrayList<Worker>();
 		for (int i = 0; i < nWorkers; i++) {
 			perThread = context.getBallsPerThread();
-			workers.add(new Worker("Worker-" + i, context.NSTEPS, context, context.getBallList().subList(tmp, tmp+=perThread)));
+			workers.add(new Worker("Worker-" + i, context.NSTEPS, context, tmp, tmp+=perThread));
 		}
 
 		for (Worker w : workers) {

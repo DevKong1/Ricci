@@ -8,6 +8,8 @@ public class Worker extends Thread {
 	private SharedContext context;
 	private final int nSteps;
 	List<Body> threadBalls;
+	private int start;
+	private int lastIndex;
 	double vt = 0;
 	double dt = 0.1;
 
@@ -17,11 +19,13 @@ public class Worker extends Thread {
 	 * threadBalls: balls assigned to this thread 
 	 * allballs: every ball in the game
 	 */
-	public Worker(final String name, final int nSteps, final SharedContext context, final List<Body> threadBalls) {
+	public Worker(final String name, final int nSteps, final SharedContext context, final int start, final int lastlIndex) {
 		super(name);
 		this.nSteps = nSteps;
-		this.context = context;
-		this.threadBalls = threadBalls;
+		this.context = context;		
+		this.start = start;
+		this.lastIndex = lastlIndex;
+		this.threadBalls = context.getBallList().subList(start, lastIndex);
 	}
 
 	public void run() {
