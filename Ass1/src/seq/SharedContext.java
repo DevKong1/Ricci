@@ -9,7 +9,7 @@ import java.util.concurrent.Semaphore;
 public final class SharedContext {
 
 	private static final SharedContext SINGLETON = new SharedContext();
-	
+	static final int NSTEPS = 2;
 	//Used to divide balls correctly between threads
 	private boolean isOdd = true;
 	//Number of threads available
