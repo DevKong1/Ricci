@@ -56,6 +56,7 @@ public class Worker extends Thread {
 			checkInternalCollisions();
 			context.releaseUpdateSem();	
 			context.waitNonConcurrentCalc();
+
 			
 			// System.out.println()
 			threadBalls.stream().forEach(x -> x.checkAndSolveBoundaryCollision(context.getBounds()));

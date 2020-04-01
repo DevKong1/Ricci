@@ -53,18 +53,6 @@ public final class SharedContext {
 	public void releaseUpdateSem(){
 		updateSemaphore.release();
 	}
-	//TODO Understand how collision should be implemented concurrently
-	public void waitCollisionMutex(final int ball1, final int ball2){
-		while(!collisionSemaphore.get(ball1).tryAcquire() && !collisionSemaphore.get(ball2).tryAcquire()){
-			try {
-				collisionSemaphore.get(ball1).acquire();
-				collisionSemaphore.get(ball2).acquire();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
 	// Returns ballList
 	public List<Body> getBallList(){
 		return this.balls;
