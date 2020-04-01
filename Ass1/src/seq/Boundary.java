@@ -1,4 +1,4 @@
-package pcd.ass01.seq;
+package src.seq;
 
 /**
  * Boundary of the field where bodies move. 
