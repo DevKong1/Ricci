@@ -1,7 +1,6 @@
 package src.seq;
 
 import java.util.List;
-import java.util.Random;
 
 public class Worker extends Thread {
 
@@ -30,14 +29,31 @@ public class Worker extends Thread {
 
 	public void run() {
 		int i = 0;
-		while(i < nSteps) {
-			threadBalls.stream().forEach(x -> x.updatePos(dt));
-			// System.out.println()
+		while(i++ < nSteps) {
+			context.lockUpdateSem();
+			// DEBUG : Old x position print
+			/*System.out.println("I'm thread " +this.getName()+" Before Updating Pos");
+			int k = 0;
+			for(Body b : context.getBallList()){
+				
+				System.out.print(i++ + " " +b.getPos().getX()+" - ");
+			}
+			i=0;
+			System.out.println("\n");  */
+			context.getBallList().subList(start, lastIndex).forEach(x -> x.updatePos(dt));
+			//DEBUG :  new x positions
+			/*System.out.println("I'm thread " +this.getName()+" Before Updating Pos");
+			for(Body b : context.getBallList()){
+				
+				System.out.print(i++ + " " +b.getPos().getX()+" - ");
+			}
+			k=0;
+			System.out.println("\n");  */
+			context.releaseUpdateSem();		
 			context.waitNonConcurrentCalc();
-			System.out.println("Thread-" + this.getName() + " ThreadBallSize:" + threadBalls.size());
+			// System.out.println()
 			threadBalls.stream().forEach(x -> x.checkAndSolveBoundaryCollision(context.getBounds()));
 			context.waitNonConcurrentCalc();
-			i++;
 		}
 
 	}

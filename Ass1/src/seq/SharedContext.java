@@ -16,6 +16,7 @@ public final class SharedContext {
 	private static final int THREADS = 3;//Runtime.getRuntime().availableProcessors() + 1 ;
 	private List<Body> balls;
 	private CyclicBarrier barrier;
+	private Semaphore updateSemaphore;
 	private List<Semaphore> collisionSemaphore;
 	private Boundary bounds;
 	
@@ -23,6 +24,7 @@ public final class SharedContext {
 	private SharedContext() {
 		barrier = new CyclicBarrier(THREADS);
 		bounds = new Boundary(-1.0,-1.0,1.0,1.0);
+		updateSemaphore = new Semaphore(1);
 	}
 
 	// returns Singleton istance
@@ -41,7 +43,16 @@ public final class SharedContext {
 			e.printStackTrace();
 		}
 	}
-	
+	public void lockUpdateSem(){
+		try {
+			updateSemaphore.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}		
+	}
+	public void releaseUpdateSem(){
+		updateSemaphore.release();
+	}
 	//TODO Understand how collision should be implemented concurrently
 	public void waitCollisionMutex(final int ball1, final int ball2){
 		while(!collisionSemaphore.get(ball1).tryAcquire() && !collisionSemaphore.get(ball2).tryAcquire()){
