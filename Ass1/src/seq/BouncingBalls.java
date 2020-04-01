@@ -10,6 +10,7 @@ public class BouncingBalls {
 
 		int nWorkers = 3;
 		int nBalls = 100;
+		int nStep = 3; // args[0]
 		//Two indexes used to split balls between threads
 		int perThread;
 		int tmp = 0;
@@ -19,7 +20,7 @@ public class BouncingBalls {
 		List<Worker> workers = new ArrayList<Worker>();
 		for (int i = 0; i < nWorkers; i++) {
 			perThread = context.getBallsPerThread();
-			workers.add(new Worker("Worker-" + i, context.NSTEPS, context, tmp, tmp+=perThread));
+			workers.add(new Worker("Worker-" + i, nStep, context, tmp, tmp+=perThread));
 		}
 
 		for (Worker w : workers) {

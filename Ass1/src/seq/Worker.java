@@ -4,13 +4,13 @@ import java.util.List;
 
 public class Worker extends Thread {
 
-	private SharedContext context;
+	private final SharedContext context;
 	private final int nSteps;
 	List<Body> threadBalls;
-	private int start;
-	private int lastIndex;
-	double vt = 0;
-	double dt = 0.1;
+	private final int start;
+	private final int lastIndex;
+	private final double vt = 0;
+	private final double dt = 0.1;
 
 	/*
 	 * name : thread 
@@ -32,7 +32,7 @@ public class Worker extends Thread {
 		while(i++ < nSteps) {
 			context.lockUpdateSem();
 			// DEBUG : Old x position print
-			/*System.out.println("I'm thread " +this.getName()+" Before Updating Pos");
+			/*log("I'm thread " +this.getName()+" Before Updating Pos");
 			int z = 0;
 			for(Body b : context.getBallList()){
 				
@@ -42,7 +42,7 @@ public class Worker extends Thread {
 			System.out.println("\n");  */
 			context.getBallList().subList(start, lastIndex).forEach(x -> x.updatePos(dt));
 			//DEBUG :  new x positions
-			/*System.out.println("I'm thread " +this.getName()+" Before Updating Pos");
+			/*log("Before Updating Pos");
 			for(Body b : context.getBallList()){
 				
 				System.out.print(i++ + " " +b.getPos().getX()+" - ");
@@ -52,8 +52,8 @@ public class Worker extends Thread {
 			context.releaseUpdateSem();		
 			context.waitNonConcurrentCalc();
 			
-			context.lockUpdateSem();
-			checkInternalCollisions();
+			context.lockUpdateSem();		
+			checkAndSolveInternalCollisions();
 			context.releaseUpdateSem();	
 			context.waitNonConcurrentCalc();
 
@@ -65,21 +65,23 @@ public class Worker extends Thread {
 
 	}
 	
-	private void log(final String msg) {
-		synchronized (System.out) {
-			System.out.println("[ " + getName() + " ] " + msg);
-		}
-	}
-	private void checkInternalCollisions(){
+	private void checkAndSolveInternalCollisions(){
 		for (int k = start; k < lastIndex - 1; k++) {
 	    	Body b1 = context.getBallList().get(k);
 	        for (int j = k + 1; j < lastIndex; j++) {
 	        	Body b2 = context.getBallList().get(j);
-	            if (b1.collideWith(b2)) {		        
-	            	Body.solveCollision(b1, b2);		            	
+	            if (b1.collideWith(b2)) {		       
+	            	//log("two balls are colliding at X:"+b1.getPos().getX()+", y="+b1.getPos().getY() +" Y:"+b2.getPos().getX()+", y="+b2.getPos().getY()+" VEL1: x:"+b1.getVel().getX() +"y:"+b1.getVel().getY()+" VEL2: x:"+b2.getVel().getX() +"y:"+b2.getVel().getY()+"\n");
+	            	Body.solveCollision(b1, b2);		    
+	            	//log("two balls are colliding at X:"+b1.getPos().getX()+", y="+b1.getPos().getY() +" Y:"+b2.getPos().getX()+", y="+b2.getPos().getY()+" VEL1: x:"+b1.getVel().getX() +"y:"+b1.getVel().getY()+" VEL2: x:"+b2.getVel().getX() +"y:"+b2.getVel().getY()+"\n");
 	            }
 	        }
         }
+	}
+	private void log(final String msg) {
+		synchronized (System.out) {
+			System.out.println("[ " + getName() + " ] " + msg);
+		}
 	}
 	private void waitFor(long ms) throws InterruptedException {
 		Thread.sleep(ms);

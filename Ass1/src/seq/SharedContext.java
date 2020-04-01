@@ -9,7 +9,11 @@ import java.util.concurrent.Semaphore;
 public final class SharedContext {
 
 	private static final SharedContext SINGLETON = new SharedContext();
-	static final int NSTEPS = 2;
+	private static final double X0 = -1.0;
+	private static final double Y0 = -1.0;
+	private static final double X1 = 1.0;
+	private static final double Y1 = 1.0;
+	private static final int SEMAPHORE_PERMITS = 1;
 	//Used to divide balls correctly between threads
 	private boolean isOdd = true;
 	//Number of threads available
@@ -23,8 +27,8 @@ public final class SharedContext {
 	// Private constructor for Singleton
 	private SharedContext() {
 		barrier = new CyclicBarrier(THREADS);
-		bounds = new Boundary(-1.0,-1.0,1.0,1.0);
-		updateSemaphore = new Semaphore(1);
+		bounds = new Boundary(X0,Y0,X1,Y1);
+		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
 	}
 
 	// returns Singleton istance
@@ -43,6 +47,7 @@ public final class SharedContext {
 			e.printStackTrace();
 		}
 	}
+	
 	public void lockUpdateSem(){
 		try {
 			updateSemaphore.acquire();
@@ -75,4 +80,5 @@ public final class SharedContext {
 		}
 		return balls.size() / THREADS;
 	}
+
 }
