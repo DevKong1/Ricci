@@ -9,7 +9,6 @@ public class Worker extends Thread {
 	List<Body> threadBalls;
 	private final int start;
 	private final int lastIndex;
-	private final double vt = 0;
 	private final double dt = 0.1;
 
 	/*
@@ -29,23 +28,28 @@ public class Worker extends Thread {
 
 	public void run() {
 		int i = 0;
-		while(i++ < nSteps) {
+		while(i++ < 1) {
+			threadBalls.forEach(x -> x.updatePos(dt));
 			context.lockUpdateSem();
 			// DEBUG : Old x position print
 			/*log("I'm thread " +this.getName()+" Before Updating Pos");
 			int z = 0;
 			for(Body b : context.getBallList()){
 				
-				System.out.print(i++ + " " +b.getPos().getX()+" - ");
+				System.out.print(z++ + " " +b.getPos().getX()+" - ");
 			}
-			z=0;
+			z=0;		
 			System.out.println("\n");  */
-			context.getBallList().subList(start, lastIndex).forEach(x -> x.updatePos(dt));
+			
+			for(int m = 0; m<threadBalls.size();m++){
+				int k = start;
+				context.updateBallList(threadBalls.get(m), k++);
+			}
 			//DEBUG :  new x positions
-			/*log("Before Updating Pos");
+			/*log("After Updating Pos");
 			for(Body b : context.getBallList()){
 				
-				System.out.print(i++ + " " +b.getPos().getX()+" - ");
+				System.out.print(z++ + " " +b.getPos().getX()+" - ");
 			}
 			z=0;
 			System.out.println("\n");  */
@@ -56,13 +60,11 @@ public class Worker extends Thread {
 			checkAndSolveInternalCollisions();
 			context.releaseUpdateSem();	
 			context.waitNonConcurrentCalc();
-
-			
+		
 			// System.out.println()
 			threadBalls.stream().forEach(x -> x.checkAndSolveBoundaryCollision(context.getBounds()));
 			context.waitNonConcurrentCalc();
 		}
-
 	}
 	
 	private void checkAndSolveInternalCollisions(){
@@ -82,8 +84,5 @@ public class Worker extends Thread {
 		synchronized (System.out) {
 			System.out.println("[ " + getName() + " ] " + msg);
 		}
-	}
-	private void waitFor(long ms) throws InterruptedException {
-		Thread.sleep(ms);
 	}
 }

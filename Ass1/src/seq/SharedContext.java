@@ -71,7 +71,9 @@ public final class SharedContext {
 	public Boundary getBounds(){
 		return this.bounds;
 	}
-	
+	public void updateBallList(Body b,int index){
+		balls.set(index, b);
+	}
 	//Returns how many balls should a SINGLE thread handle.
 	public int getBallsPerThread(){
 		if(balls.size() % THREADS  != 0 && isOdd){
