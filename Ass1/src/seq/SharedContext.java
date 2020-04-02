@@ -81,14 +81,24 @@ public final class SharedContext {
 	// Creates the array of bodies
 	public void setBallList(final List<Body> balls) {
 		this.balls = balls;
-		collisionSemaphore = new Vector<Semaphore>(balls.size());
 		matrix.init(balls.size());
+		initCollisonVector();
 		
 		if(balls.size() % THREADS  != 0) {
 			isOdd = true;
 		}
 	}
 	
+	private void initCollisonVector() {
+		collisionSemaphore = new Vector<Semaphore>(balls.size());
+		
+		for(int i = 0; i < collisionSemaphore.size(); i++) {
+			collisionSemaphore.add(new Semaphore(SEMAPHORE_PERMITS));
+		}
+		
+	}
+	
+	//Lock 2 balls
 	public void lockBalls(int b1, int b2){
 		try {
 			collisionSemaphore.get(b1).acquire();
@@ -97,6 +107,7 @@ public final class SharedContext {
 			e.printStackTrace();
 		}		
 	}
+	//Release 2 balls
 	public void releaseBalls(int b1, int b2){
 		collisionSemaphore.get(b1).release();
 		collisionSemaphore.get(b2).release();
