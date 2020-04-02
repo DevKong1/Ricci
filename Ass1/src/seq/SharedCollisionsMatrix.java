@@ -14,7 +14,7 @@ public class SharedCollisionsMatrix {
 	public synchronized void init(int size) {
 		available = true;
 		reset(size);
-		notifyAll();  
+		notifyAll();
 	}
 	
 	public synchronized void reset(int size) {

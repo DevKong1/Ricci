@@ -36,7 +36,7 @@ public final class SharedContext {
 		bounds = new Boundary(X0,Y0,X1,Y1);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
 		matrix = new SharedCollisionsMatrix();
-		ticketSemaphore = new TicketSemaphore();
+		ticketSemaphore = new TicketSemaphore(THREADS);
 	}
 
 	// returns Singleton instance
@@ -68,16 +68,10 @@ public final class SharedContext {
 	}
 	
 	public void getTicketAndWait() {
-		try {
-			int myTurn = ticketSemaphore.getTicket();
-			
-			while(ticketSemaphore.getTurn() != myTurn) {
-				ticketSemaphore.getSemaphore().wait();
-			}
-			
-			} catch (InterruptedException e) {
-			e.printStackTrace();
+		while(!ticketSemaphore.tryEnqueue()) {
+			ticketSemaphore.lockTicket();
 		}
+		ticketSemaphore.releaseTicket();
 	}	
 	
 	// Returns ballList
@@ -106,6 +100,8 @@ public final class SharedContext {
 	public void releaseBalls(int b1, int b2){
 		collisionSemaphore.get(b1).release();
 		collisionSemaphore.get(b2).release();
+		collisionSemaphore.get(b1).notifyAll();
+		collisionSemaphore.get(b2).notifyAll();
 	}
 	
 	//Returns map boundaries

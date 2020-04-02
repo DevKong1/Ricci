@@ -6,33 +6,24 @@ public class TicketSemaphore {
 
 	private static final int SEMAPHORE_PERMITS = 1;
 	private Semaphore ticket;
-	private int turn;
-	private int last;
+	private int queued;
+	private final int max;
 	
-	public TicketSemaphore() {
+	public TicketSemaphore(int m) {
 		ticket = new Semaphore(SEMAPHORE_PERMITS);
-		reset();
+		queued = 0;
+		max = m;
 	}
 	
-	public void reset() {
-		turn = 0;
-		last = 0;
+	public synchronized Boolean tryEnqueue() {
+		if(queued >= max - 1) {
+			return false;
+		}
+		queued++;
+		return true;
 	}
 	
-	public synchronized int getTicket() {
-		return last++;
-	}
-	
-	public synchronized int getTurn() {
-		return turn;
-	}
-	
-	public synchronized Semaphore getSemaphore() {
-		return ticket;
-	}
-	
-	
-	public synchronized void lockUpdateSem(){
+	public synchronized void lockTicket(){
 		try {
 			ticket.acquire();
 		} catch (InterruptedException e) {
@@ -40,9 +31,9 @@ public class TicketSemaphore {
 		}		
 	}
 	
-	public synchronized void releaseUpdateSem(){
+	public synchronized void releaseTicket(){
 		ticket.release();
-		turn++;
+		queued--;
 		ticket.notifyAll();
 	}
 }
