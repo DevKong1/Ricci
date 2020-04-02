@@ -92,27 +92,22 @@ public final class SharedContext {
 	private void initCollisonVector() {
 		collisionSemaphore = new Vector<Semaphore>(balls.size());
 		
-		for(int i = 0; i < collisionSemaphore.size(); i++) {
+		for(int i = 0; i < balls.size(); i++) {
 			collisionSemaphore.add(new Semaphore(SEMAPHORE_PERMITS));
 		}
-		
 	}
 	
 	//Lock 2 balls
-	public void lockBalls(int b1, int b2){
+	public void lockBall(int b1){
 		try {
 			collisionSemaphore.get(b1).acquire();
-			collisionSemaphore.get(b2).acquire();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}		
 	}
 	//Release 2 balls
-	public void releaseBalls(int b1, int b2){
+	public void releaseBall(int b1){
 		collisionSemaphore.get(b1).release();
-		collisionSemaphore.get(b2).release();
-		collisionSemaphore.get(b1).notifyAll();
-		collisionSemaphore.get(b2).notifyAll();
 	}
 	
 	//Returns map boundaries
@@ -135,6 +130,11 @@ public final class SharedContext {
 			return (balls.size() / THREADS) + (balls.size() % THREADS);
 		}
 		return balls.size() / THREADS;
+	}
+	
+	//TESTING METHOD
+	public void printVel(int index) {
+		System.out.println(index + " Global Velocity: " + balls.get(index).getVel().getX() + "  ---- " + balls.get(index).getVel().getY());
 	}
 
 }

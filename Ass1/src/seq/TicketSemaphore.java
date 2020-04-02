@@ -15,7 +15,7 @@ public class TicketSemaphore {
 		max = m;
 	}
 	
-	public synchronized Boolean tryEnqueue() {
+	public Boolean tryEnqueue() {
 		if(queued >= max - 1) {
 			return false;
 		}
@@ -23,7 +23,7 @@ public class TicketSemaphore {
 		return true;
 	}
 	
-	public synchronized void lockTicket(){
+	public void lockTicket(){
 		try {
 			ticket.acquire();
 		} catch (InterruptedException e) {
@@ -31,9 +31,8 @@ public class TicketSemaphore {
 		}		
 	}
 	
-	public synchronized void releaseTicket(){
+	public void releaseTicket(){
 		ticket.release();
 		queued--;
-		ticket.notifyAll();
 	}
 }
