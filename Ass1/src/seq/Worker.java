@@ -30,6 +30,7 @@ public class Worker extends Thread {
 		int i = 0;
 		while(i++ < 1) {
 			threadBalls.forEach(x -> x.updatePos(dt));
+			checkAndSolveInternalCollisions();
 			context.lockUpdateSem();
 			// DEBUG : Old x position print
 			/*log("I'm thread " +this.getName()+" Before Updating Pos");
@@ -41,10 +42,8 @@ public class Worker extends Thread {
 			z=0;		
 			System.out.println("\n");  */
 			
-			for(int m = 0; m<threadBalls.size();m++){
-				int k = start;
-				context.updateBallList(threadBalls.get(m), k++);
-			}
+			
+			updateGlobalList();
 			//DEBUG :  new x positions
 			/*log("After Updating Pos");
 			for(Body b : context.getBallList()){
@@ -53,11 +52,11 @@ public class Worker extends Thread {
 			}
 			z=0;
 			System.out.println("\n");  */
-			context.releaseUpdateSem();		
-			context.waitNonConcurrentCalc();
-				
-			checkAndSolveInternalCollisions();
-			checkAndSolveExternalCollisions();
+			context.releaseUpdateSem();	
+			
+			context.waitNonConcurrentCalc();				
+			
+			//checkAndSolveExternalCollisions();
 			
 			context.waitNonConcurrentCalc();
 		
@@ -67,25 +66,29 @@ public class Worker extends Thread {
 		}
 	}
 	
+	//Checks if there are any collisions between balls handled by a SINGLE thread, if so, it solves them.
 	private void checkAndSolveInternalCollisions(){
-		for (int k = start; k < lastIndex - 1; k++) {
-	    	Body b1 = context.getBallList().get(k);
-	        for (int j = k + 1; j < lastIndex; j++) {
-	        	Body b2 = context.getBallList().get(j);
+		for (int k = 0; k < threadBalls.size()  - 1; k++) {
+	    	Body b1 = threadBalls.get(k);
+	        for (int j = k + 1; j < threadBalls.size(); j++) {
+	        	Body b2 = threadBalls.get(j);
 	            if (b1.collideWith(b2)) {	
-	            	context.getTicketAndWait();
-	            	
-	            	//if a collision is detected the bodies are locked and the context updated
-	    			context.lockBalls(k, j);	       
+	            	//if a collision is detected the bodies are locked and the context updated    
 	            	//log("two balls are colliding at X:"+b1.getPos().getX()+", y="+b1.getPos().getY() +" Y:"+b2.getPos().getX()+", y="+b2.getPos().getY()+" VEL1: x:"+b1.getVel().getX() +"y:"+b1.getVel().getY()+" VEL2: x:"+b2.getVel().getX() +"y:"+b2.getVel().getY()+"\n");
 	            	Body.solveCollision(b1, b2);		    
 	            	//log("two balls are colliding at X:"+b1.getPos().getX()+", y="+b1.getPos().getY() +" Y:"+b2.getPos().getX()+", y="+b2.getPos().getY()+" VEL1: x:"+b1.getVel().getX() +"y:"+b1.getVel().getY()+" VEL2: x:"+b2.getVel().getX() +"y:"+b2.getVel().getY()+"\n");
-	    			context.releaseBalls(k, j);	
+	            	
 	            }
 	        }
         }
 	}
 	
+	private void updateGlobalList(){
+		for(int m = 0; m<threadBalls.size();m++){
+			int k = start;
+			context.updateBallList(threadBalls.get(m), k++);
+		}
+	}
 	private void checkAndSolveExternalCollisions(){
 		int allBalls = context.getBallList().size();
 		

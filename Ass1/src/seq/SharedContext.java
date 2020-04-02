@@ -22,9 +22,12 @@ public final class SharedContext {
 	private List<Body> balls;
 	private CyclicBarrier barrier;
 	private Semaphore updateSemaphore;
+	
 	private TicketSemaphore ticketSemaphore;
+	
 	private Vector<Semaphore> collisionSemaphore;
 	private Boundary bounds;
+	
 	private SharedCollisionsMatrix matrix; //matrix to check if a collision has already been solved
 	
 	// Private constructor for Singleton
