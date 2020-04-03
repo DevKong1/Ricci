@@ -1,6 +1,5 @@
 package src.seq;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.BrokenBarrierException;
@@ -15,10 +14,10 @@ public final class SharedContext {
 	private static final double X1 = 1.0;
 	private static final double Y1 = 1.0;
 	private static final int SEMAPHORE_PERMITS = 1;
+	private static final int THREADS = 3;//Runtime.getRuntime().availableProcessors() + 1 ;
 	//Used to divide balls correctly between threads
 	private boolean isOdd;
 	//Number of threads available
-	private static final int THREADS = 3;//Runtime.getRuntime().availableProcessors() + 1 ;
 	private List<Body> balls;
 	private CyclicBarrier barrier;
 	private Semaphore updateSemaphore;
@@ -44,7 +43,9 @@ public final class SharedContext {
 		return SharedContext.SINGLETON;
 	}
 
-
+	/** 
+	 * LOCK & UNLOCK METHODS, used access items in shared context concurrently.
+	 */
 	// lets thread synchronize on a cyclic barrier:
 	// First time when every thread calculated new balls positions'
 	// Second time when every thread checks collision with boundaries
@@ -77,6 +78,23 @@ public final class SharedContext {
 		ticketSemaphore.releaseTicket();
 	}	
 	
+	//Lock 2 balls
+	public void lockBall(final int b1){
+		try {
+			collisionSemaphore.get(b1).acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}		
+	}
+	//Release 2 balls
+	public void releaseBall(final int b1){
+		collisionSemaphore.get(b1).release();
+	}
+	
+	/**
+	 * Getter & Setter
+	 *
+	 */
 	// Returns ballList
 	public List<Body> getBallList(){
 		return this.balls;
@@ -91,6 +109,7 @@ public final class SharedContext {
 			isOdd = true;
 		}
 	}
+
 	
 	private void initCollisonVector() {
 		collisionSemaphore = new Vector<Semaphore>(balls.size());
@@ -98,19 +117,6 @@ public final class SharedContext {
 		for(int i = 0; i < balls.size(); i++) {
 			collisionSemaphore.add(new Semaphore(SEMAPHORE_PERMITS));
 		}
-	}
-	
-	//Lock 2 balls
-	public void lockBall(int b1){
-		try {
-			collisionSemaphore.get(b1).acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}		
-	}
-	//Release 2 balls
-	public void releaseBall(int b1){
-		collisionSemaphore.get(b1).release();
 	}
 	
 	//Returns map boundaries
@@ -123,7 +129,7 @@ public final class SharedContext {
 		return this.matrix;
 	}
 	
-	public void updateBallList(Body b,int index){
+	public void updateBallList(final Body b,final int index){
 		balls.set(index, b);
 	}
 	//Returns how many balls should a SINGLE thread handle.
@@ -134,9 +140,16 @@ public final class SharedContext {
 		}
 		return balls.size() / THREADS;
 	}
+	public static int getWorkers(){
+		return THREADS;
+	}
 	
+	/**
+	 * Testing methods
+	 * 
+	 */
 	//TESTING METHOD
-	public void printVel(int index) {
+	public void printVel(final int index) {
 		System.out.println(index + " Global Velocity: " + balls.get(index).getVel().getX() + "  ---- " + balls.get(index).getVel().getY());
 	}
 
