@@ -69,9 +69,7 @@ public final class SharedContext {
 	}
 	
 	public void getTicketAndWait() {
-		while(!ticketSemaphore.tryEnqueue()) {
-			ticketSemaphore.lockTicket();
-		}
+		ticketSemaphore.lockTicket();
 	}	
 	
 	public void releaseTicket() {

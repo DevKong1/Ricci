@@ -64,6 +64,11 @@ public class Worker extends Thread {
 		
 			// System.out.println()
 			threadBalls.stream().forEach(x -> x.checkAndSolveBoundaryCollision(context.getBounds()));
+			
+			context.lockUpdateSem();
+			updateGlobalList();
+			context.releaseUpdateSem();	
+			
 			context.waitNonConcurrentCalc();
 		}
 	}
@@ -100,15 +105,13 @@ public class Worker extends Thread {
     	context.getTicketAndWait();
 		log("Got ticket");
 		
-    	leftCheck();
     	rightCheck();
     	
     	context.releaseTicket();
 		log("Released ticket");
 	}
-	
-	private void leftCheck() {
-		
+
+	private void rightCheck() {	
 		for (int k = start; k < lastIndex; k++) {
 			//lock on first ball to check
 			log("Getting " + k + " ...");
@@ -117,15 +120,14 @@ public class Worker extends Thread {
 			
 	    	Body b1 = context.getBallList().get(k);
 	    	
-	        for (int j = 0; j < start; j++) {
-				//lock on second ball to check
-				log("Getting " + j + " ...");
-				context.lockBall(j);
-				log("Got  " + j);
-					
+	        for (int j = lastIndex+1; j < context.getBallList().size(); j++) {
+        		//lock on second ball to check
+    			//log("Getting " + j + " ...");
+    			context.lockBall(j);
+    			//log("Got " + j);
+    			
         		//check if the collision has already been solved
 	        	if(!context.getMatrix().checkAndSet(k, j)) {
-	        		
 		        	Body b2 = context.getBallList().get(j);
 		        	
 		            if (b1.collideWith(b2)) {		
@@ -143,52 +145,12 @@ public class Worker extends Thread {
 		            	//log("two balls are colliding at X:"+b1.getPos().getX()+", y="+b1.getPos().getY() +" Y:"+b2.getPos().getX()+", y="+b2.getPos().getY()+" VEL1: x:"+b1.getVel().getX() +"y:"+b1.getVel().getY()+" VEL2: x:"+b2.getVel().getX() +"y:"+b2.getVel().getY()+"\n");
 		            }
 	            }
-				
-				log("Releasing  " + j);
-				context.releaseBall(j);	   	
+	        	
+    			//log("Releasing  " + j);
+    			context.releaseBall(j);		          			
 	        }
-			log("Releasing  " + k);
-	        context.releaseBall(k);
-        }
-	}
-	
-	private void rightCheck() {	
-		for (int k = start; k < lastIndex; k++) {
-			//lock on first ball to check
-			log("Getting " + k + " ...");
-			context.lockBall(k);
-			log("Got " + k );
-			
-	    	Body b1 = context.getBallList().get(k);
-	    	
-	        for (int j = lastIndex+1; j < context.getBallList().size(); j++) {
-        		//check if the collision has already been solved
-	        	if(!context.getMatrix().checkAndSet(k, j)) {
-	        		//lock on second ball to check
-	    			log("Getting " + j + " ...");
-	    			context.lockBall(j);
-	    			log("Got " + j);
-		        	Body b2 = context.getBallList().get(j);
-		        	
-		            if (b1.collideWith(b2)) {		
-		            	
-		            	//if a collision is detected the bodies are locked and the context updated
-		    			//context.lockBalls(k, j);	   		          
-		            	//log("two balls are colliding at X:"+b1.getPos().getX()+", y="+b1.getPos().getY() +" Y:"+b2.getPos().getX()+", y="+b2.getPos().getY()+" VEL1: x:"+b1.getVel().getX() +"y:"+b1.getVel().getY()+" VEL2: x:"+b2.getVel().getX() +"y:"+b2.getVel().getY()+"\n");
-		            	
-		            	Body.solveCollision(b1, b2);	
-		            	log(k + " Local Velocity:" + b1.getVel().getX() + "  ---- " + b1.getVel().getY());	   
-		            	log(j + " Local Velocity:" + b2.getVel().getX() + "  ---- " + b2.getVel().getY());	    
-		            	//context.printVel(k);   
-		            	//context.printVel(j);
-		            	
-		            	//log("two balls are colliding at X:"+b1.getPos().getX()+", y="+b1.getPos().getY() +" Y:"+b2.getPos().getX()+", y="+b2.getPos().getY()+" VEL1: x:"+b1.getVel().getX() +"y:"+b1.getVel().getY()+" VEL2: x:"+b2.getVel().getX() +"y:"+b2.getVel().getY()+"\n");
-		            }
-	    			log("Releasing  " + j);
-	    			context.releaseBall(j);	
-	            }	        	
-	        }
-			log("Releasing  " + k);
+	        
+			//log("Releasing  " + k);
 	        context.releaseBall(k);
         }
 		
