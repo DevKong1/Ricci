@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
 public class BouncingBalls {
 
 	public static void main(String[] args) {
@@ -23,13 +22,6 @@ public class BouncingBalls {
 			perThread = context.getBallsPerThread();
 			workers.add(new Worker("Worker-" + i, nStep, context, tmp, tmp+=perThread));
 		}
-		ModelGUI model = new ModelGUI();
-		ControllerGUI controller = new ControllerGUI(model);
-	    ViewGUI view = new ViewGUI(controller);
-	    model.addObserver(view);    
-	    view.setVisible(true);
-	    
-	    new AgentGUI(model).start();
 
 		for (Worker w : workers) {
 			w.start();
