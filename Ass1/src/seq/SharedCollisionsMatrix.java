@@ -5,17 +5,18 @@ import java.util.Vector;
 public class SharedCollisionsMatrix {
 
 	private Vector<Vector<Boolean>> matrix;
+	private int size;
 	private static final int WORKERS = SharedContext.getWorkers();
 	
-	public SharedCollisionsMatrix() {
+	public SharedCollisionsMatrix() {	
 	}
 	
-	public synchronized void init(final int size) {
-		reset(size);
-		notifyAll();
+	public void init(final int size) {
+		this.size = size;
+		reset();
 	}
 	
-	public synchronized void reset(final int size) {
+	public synchronized void reset() {
 		 int limit = size/WORKERS;
 		 int alreadyCheked = 1;
 		 int innerSize = 1;
@@ -40,7 +41,7 @@ public class SharedCollisionsMatrix {
 	}
 	
 	
-	public synchronized Boolean checkAndSet(int ball1, int ball2) {
+	public Boolean checkAndSet(int ball1, int ball2) {
 		//Since the matrix is triangular, "biggest" item needs to be first
 		if(ball2 > ball1){
 			int tmp = ball1;
@@ -54,7 +55,6 @@ public class SharedCollisionsMatrix {
 				matrix.get(ball1).set(ball2, true);
 		} 
 		
-		notifyAll();
 		return r1;
 	}
 }

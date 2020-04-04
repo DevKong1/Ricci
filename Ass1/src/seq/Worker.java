@@ -28,7 +28,10 @@ public class Worker extends Thread {
 
 	public void run() {
 		int i = 0;
-		while(i++ < 1) {
+		while(i++ < nSteps) {
+			//DEBUG TODO delete
+			context.resetPrint();
+			
 			threadBalls.forEach(x -> x.updatePos(dt));
 			checkAndSolveInternalCollisions();
 			context.lockUpdateSem();
@@ -69,6 +72,14 @@ public class Worker extends Thread {
 			updateGlobalList();
 			context.releaseUpdateSem();	
 			
+			context.waitNonConcurrentCalc();
+
+			//DEBUG TODO delete
+			context.lockUpdateSem();
+			context.printMatrix();
+			context.releaseUpdateSem();	
+			
+			context.getMatrix().reset();
 			context.waitNonConcurrentCalc();
 		}
 	}
@@ -114,9 +125,9 @@ public class Worker extends Thread {
 	private void rightCheck() {	
 		for (int k = start; k < lastIndex; k++) {
 			//lock on first ball to check
-			log("Getting " + k + " ...");
+			//log("Getting " + k + " ...");
 			context.lockBall(k);
-			log("Got " + k );
+			//log("Got " + k );
 			
 	    	Body b1 = context.getBallList().get(k);
 	    	

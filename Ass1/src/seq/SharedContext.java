@@ -28,6 +28,9 @@ public final class SharedContext {
 	private Boundary bounds;
 	
 	private SharedCollisionsMatrix matrix; //matrix to check if a collision has already been solved
+
+	//TESING VARIABLE TODO DELETE
+	private Boolean printreset = true;
 	
 	// Private constructor for Singleton
 	private SharedContext() {
@@ -149,6 +152,21 @@ public final class SharedContext {
 	//TESTING METHOD
 	public void printVel(final int index) {
 		System.out.println(index + " Global Velocity: " + balls.get(index).getVel().getX() + "  ---- " + balls.get(index).getVel().getY());
+	}
+	
+	public void printMatrix(){
+		if(!printreset) {
+			return;
+		}
+		
+		for(int i = 0; i < balls.size(); i++) {
+			printVel(i);
+		}		
+		printreset = false;
+	}
+	
+	public void resetPrint(){
+		printreset = true;
 	}
 
 }
