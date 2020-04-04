@@ -1,5 +1,6 @@
 package src.seq;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Worker extends Thread {
@@ -23,14 +24,16 @@ public class Worker extends Thread {
 		this.context = context;		
 		this.start = start;
 		this.lastIndex = lastlIndex;
-		this.threadBalls = context.getBallList().subList(start, lastIndex);
+		this.threadBalls =  new ArrayList<Body>(context.getBallList().subList(start, lastIndex));
 	}
 
 	public void run() {
 		int i = 0;
 		while(i++ < nSteps) {
 			//DEBUG TODO delete
-			context.resetPrint();
+			log(""+i);
+			//context.resetPrint();
+			context.resetUpdate();
 			
 			threadBalls.forEach(x -> x.updatePos(dt));
 			checkAndSolveInternalCollisions();
@@ -76,12 +79,13 @@ public class Worker extends Thread {
 
 			//DEBUG TODO delete
 			context.lockUpdateSem();
-			context.printMatrix();
+			//context.printMatrix();
+			context.updatePositions();
+			context.getMatrix().reset();
 			context.releaseUpdateSem();	
 			
-			context.getMatrix().reset();
 			context.waitNonConcurrentCalc();
-		}
+		}		
 	}
 	
 	//Checks if there are any collisions between balls handled by a SINGLE thread, if so, it solves them.

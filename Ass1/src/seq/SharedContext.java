@@ -13,8 +13,9 @@ public final class SharedContext {
 	private static final double Y0 = -1.0;
 	private static final double X1 = 1.0;
 	private static final double Y1 = 1.0;
+	private static final double dt = 0.1;
 	private static final int SEMAPHORE_PERMITS = 1;
-	private static final int THREADS = 3;//Runtime.getRuntime().availableProcessors() + 1 ;
+	private static final int THREADS = 6;//Runtime.getRuntime().availableProcessors() + 1 ;
 	//Used to divide balls correctly between threads
 	private boolean isOdd;
 	//Number of threads available
@@ -29,6 +30,9 @@ public final class SharedContext {
 	
 	private SharedCollisionsMatrix matrix; //matrix to check if a collision has already been solved
 
+	//boolean used to updatepositions only once each step
+	private Boolean canUpdate = true;
+	
 	//TESING VARIABLE TODO DELETE
 	private Boolean printreset = true;
 	
@@ -90,7 +94,7 @@ public final class SharedContext {
 	//Release 2 balls
 	public void releaseBall(final int b1){
 		collisionSemaphore.get(b1).release();
-	}
+	}	
 	
 	/**
 	 * Getter & Setter
@@ -146,12 +150,32 @@ public final class SharedContext {
 	}
 	
 	/**
+	 * Update Positions methods
+	 *
+	 */
+	public void updatePositions(){
+		if(!canUpdate) {
+			return;
+		}
+		
+		for (Body b: balls) {
+    		b.updatePos(dt);
+	    }	
+		canUpdate = false;
+	}
+	
+	public void resetUpdate(){
+		canUpdate = true;
+	}
+	
+	/**
 	 * Testing methods
 	 * 
 	 */
 	//TESTING METHOD
 	public void printVel(final int index) {
-		System.out.println(index + " Global Velocity: " + balls.get(index).getVel().getX() + "  ---- " + balls.get(index).getVel().getY());
+		Body considered = balls.get(index);
+		System.out.println(index + "Position: "+ considered.getPos().getX()+ "-" + considered.getPos().getY() +" Global Velocity: " + balls.get(index).getVel().getX() + "  ---- " + balls.get(index).getVel().getY());
 	}
 	
 	public void printMatrix(){

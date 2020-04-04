@@ -8,9 +8,9 @@ public class BouncingBalls {
 
 	public static void main(String[] args) {
 
-		int nWorkers = 3;
+		int nWorkers = 6;
 		int nBalls = 100;
-		int nStep = 3; // args[0]
+		int nStep = 50; // args[0]
 		//Two indexes used to split balls between threads
 		int perThread;
 		int tmp = 0;
@@ -26,7 +26,7 @@ public class BouncingBalls {
 		for (Worker w : workers) {
 			w.start();
 		}
-
+		
 	}
 
 	private static List<Body> generateBalls(final int n) {

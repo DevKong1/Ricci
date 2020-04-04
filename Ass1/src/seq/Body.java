@@ -119,7 +119,7 @@ public class Body {
     	double fact21 = (x21dx*v21dx + x21dy*v21dy) / (x21dx*x21dx + x21dy*x21dy);    	
     	double v2x = v2.getX() - x21dx*fact21;
     	double v2y = v2.getY() - x21dy*fact21;
-    	
+
     	b1.changeVel(v1x, v1y);
     	b2.changeVel(v2x, v2y);
     }

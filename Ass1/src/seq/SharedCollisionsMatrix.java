@@ -1,12 +1,14 @@
 package src.seq;
 
 import java.util.Vector;
+import java.util.concurrent.Semaphore;
 
 public class SharedCollisionsMatrix {
 
 	private Vector<Vector<Boolean>> matrix;
 	private int size;
 	private static final int WORKERS = SharedContext.getWorkers();
+	private final Semaphore sem = new Semaphore(1);
 	
 	public SharedCollisionsMatrix() {	
 	}
@@ -41,7 +43,14 @@ public class SharedCollisionsMatrix {
 	}
 	
 	
-	public Boolean checkAndSet(int ball1, int ball2) {
+	public synchronized Boolean checkAndSet(int ball1, int ball2) {
+		try {
+			sem.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		//Since the matrix is triangular, "biggest" item needs to be first
 		if(ball2 > ball1){
 			int tmp = ball1;
@@ -54,6 +63,8 @@ public class SharedCollisionsMatrix {
 		if(!r1) {
 				matrix.get(ball1).set(ball2, true);
 		} 
+		
+		sem.release();
 		
 		return r1;
 	}
