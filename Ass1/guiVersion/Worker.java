@@ -1,4 +1,4 @@
-package src.seq;
+package guiVersion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +85,7 @@ public class Worker extends Thread {
 			context.releaseUpdateSem();	
 			
 			context.waitNonConcurrentCalc();
+			context.hitBarrier();
 		}		
 	}
 	

@@ -1,4 +1,4 @@
-package src.seq;
+package noGUI;
 
 public class Position { 
 

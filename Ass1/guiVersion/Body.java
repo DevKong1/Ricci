@@ -1,4 +1,4 @@
-package src.seq;
+package guiVersion;
 
 import java.util.*;
 

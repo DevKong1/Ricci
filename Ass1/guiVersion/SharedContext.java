@@ -1,4 +1,4 @@
-package src.seq;
+package guiVersion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +16,14 @@ public final class SharedContext {
 	private static final double Y1 = 1.0;
 	private static final double dt = 0.1;
 	private static final int SEMAPHORE_PERMITS = 1;
-	private static final int THREADS = 6;//Runtime.getRuntime().availableProcessors() + 1 ;
+	private static final int THREADS = 3;//Runtime.getRuntime().availableProcessors() + 1 ;
 	//Used to divide balls correctly between threads
 	private boolean isOdd;
 	//Number of threads available
 	private List<Body> balls;
 	private CyclicBarrier barrier;
 	private Semaphore updateSemaphore;
+	private CyclicBarrier guiSemaphore;
 	
 	private TicketSemaphore ticketSemaphore;
 	
@@ -44,6 +45,7 @@ public final class SharedContext {
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
 		matrix = new SharedCollisionsMatrix();
 		ticketSemaphore = new TicketSemaphore(THREADS);
+		guiSemaphore = new CyclicBarrier(THREADS+1);
 	}
 
 	// returns Singleton instance
@@ -95,7 +97,15 @@ public final class SharedContext {
 	//Release 2 balls
 	public void releaseBall(final int b1){
 		collisionSemaphore.get(b1).release();
-	}	
+	}
+	public void hitBarrier(){
+		try {
+			this.guiSemaphore.await();
+		} catch (InterruptedException | BrokenBarrierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Getter & Setter

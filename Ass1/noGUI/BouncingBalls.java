@@ -1,26 +1,28 @@
-package src.seq;
+package noGUI;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 public class BouncingBalls {
 
-	public static void main(String[] args) {
+	public static void main(String []args) {
 
-		int nWorkers = 6;
+		int nWorkers = 3;
 		int nBalls = 100;
-		int nStep = 50; // args[0]
-		//Two indexes used to split balls between threads
+		int nStep = 500;
+		SharedContext context = SharedContext.getIstance();
+		// Two indexes used to split balls between threads
 		int perThread;
 		int tmp = 0;
-		//A shared context with which threads will coordinate
-		SharedContext context = SharedContext.getIstance();
-		context.setBallList(generateBalls(nBalls));
+		List<Body> balls = generateBalls(nBalls);
+		// A shared context with which threads will coordinate
+		context.setBallList(balls);
 		List<Worker> workers = new ArrayList<Worker>();
 		for (int i = 0; i < nWorkers; i++) {
 			perThread = context.getBallsPerThread();
-			workers.add(new Worker("Worker-" + i, nStep, context, tmp, tmp+=perThread));
+			workers.add(new Worker("Worker-" + i, nStep, context, tmp, tmp += perThread));
 		}
 
 		for (Worker w : workers) {

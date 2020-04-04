@@ -1,4 +1,4 @@
-package src.seq;
+package noGUI;
 
 import java.util.concurrent.Semaphore;
 
