@@ -1,5 +1,6 @@
 package src.seq;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.BrokenBarrierException;
@@ -106,7 +107,7 @@ public final class SharedContext {
 	}
 	// Creates the array of bodies
 	public void setBallList(final List<Body> balls) {
-		this.balls = balls;
+		this.balls = new ArrayList<Body>(balls);
 		matrix.init(balls.size());
 		initCollisonVector();
 		

@@ -7,7 +7,7 @@ public class Worker extends Thread {
 
 	private final SharedContext context;
 	private final int nSteps;
-	List<Body> threadBalls;
+	private List<Body> threadBalls;
 	private final int start;
 	private final int lastIndex;
 	private final double dt = 0.1;
