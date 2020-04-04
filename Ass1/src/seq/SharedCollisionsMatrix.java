@@ -17,9 +17,9 @@ public class SharedCollisionsMatrix {
 	}
 	
 	public synchronized void reset() {
-		 int limit = size/WORKERS;
-		 int alreadyCheked = 1;
-		 int innerSize = 1;
+		int limit = size/WORKERS;
+		int alreadyCheked = 1;
+		int innerSize = 1;
 		matrix = new Vector<Vector<Boolean>>();
 		for (int i = 0; i < size; i++) {
 			Vector<Boolean> tmp = new Vector<>();
@@ -41,7 +41,7 @@ public class SharedCollisionsMatrix {
 	}
 	
 	
-	public Boolean checkAndSet(int ball1, int ball2) {
+	public synchronized Boolean checkAndSet(int ball1, int ball2) {
 		//Since the matrix is triangular, "biggest" item needs to be first
 		if(ball2 > ball1){
 			int tmp = ball1;
@@ -52,7 +52,7 @@ public class SharedCollisionsMatrix {
 		Boolean r1 = matrix.get(ball1).get(ball2);
 		
 		if(!r1) {
-				matrix.get(ball1).set(ball2, true);
+			matrix.get(ball1).set(ball2, true);
 		} 
 		
 		return r1;

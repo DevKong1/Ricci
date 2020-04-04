@@ -1,12 +1,13 @@
 package src.seq;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Worker extends Thread {
 
 	private final SharedContext context;
 	private final int nSteps;
-	List<Body> threadBalls;
+	private List<Body> threadBalls;
 	private final int start;
 	private final int lastIndex;
 	private final double dt = 0.1;
@@ -23,7 +24,7 @@ public class Worker extends Thread {
 		this.context = context;		
 		this.start = start;
 		this.lastIndex = lastlIndex;
-		this.threadBalls = context.getBallList().subList(start, lastIndex);
+		this.threadBalls = new ArrayList<Body>(context.getBallList().subList(start, lastIndex));
 	}
 
 	public void run() {
