@@ -29,7 +29,7 @@ public class Worker extends Thread {
 
 	public void run() {
 		int i = 0;
-		while(i++ < nSteps) {
+		while(i++ < nSteps && !context.getStop()) {
 			//DEBUG TODO delete
 			log(""+i);
 			//context.resetPrint();
@@ -38,26 +38,8 @@ public class Worker extends Thread {
 			threadBalls.forEach(x -> x.updatePos(dt));
 			checkAndSolveInternalCollisions();
 			context.lockUpdateSem();
-			// DEBUG : Old x position print
-			/*log("I'm thread " +this.getName()+" Before Updating Pos");
-			int z = 0;
-			for(Body b : context.getBallList()){
-				
-				System.out.print(z++ + " " +b.getPos().getX()+" - ");
-			}
-			z=0;		
-			System.out.println("\n");  */
-			
 			
 			updateGlobalList();
-			//DEBUG :  new x positions
-			/*log("After Updating Pos");
-			for(Body b : context.getBallList()){
-				
-				System.out.print(z++ + " " +b.getPos().getX()+" - ");
-			}
-			z=0;
-			System.out.println("\n");  */
 			context.releaseUpdateSem();	
 			
 			context.waitNonConcurrentCalc();	

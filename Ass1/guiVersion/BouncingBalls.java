@@ -7,47 +7,33 @@ import java.util.Random;
 
 public class BouncingBalls {
 
-	private int nWorkers;
-	private int nBalls;
 	private int nStep;
 	private SharedContext context;
 	private SimulationViewer view;
+	private int j = 1;
+	private double vt = 0;
+	private double dt = 0.1;
+	List<Worker> workers;
 
-	public BouncingBalls(final int threads, final int balls, final int steps, SimulationViewer v) {
-		nWorkers = threads;
-		nBalls = balls;
-		nStep = steps;
+	public BouncingBalls(final int nWorkers, final int nBalls, final int nStep) {
+		this.nStep = nStep;
 		context = SharedContext.getIstance();
-		view = v;
-	}
-
-	public void run() {
-		int j = 1;
-
-		double vt = 0;
-		double dt = 0.1;
-
+		workers = new ArrayList<Worker>();
 		// Two indexes used to split balls between threads
+		
 		int perThread;
 		int tmp = 0;
 		List<Body> balls = generateBalls(nBalls);
 		// A shared context with which threads will coordinate
 		context.setBallList(balls);
-		List<Worker> workers = new ArrayList<Worker>();
+
 		for (int i = 0; i < nWorkers; i++) {
 			perThread = context.getBallsPerThread();
 			workers.add(new Worker("Worker-" + i, nStep, context, tmp, tmp += perThread));
 		}
-
-		for (Worker w : workers) {
-			w.start();
-		}
-		while (j++ <= nStep) {
-			context.hitBarrier();
-			vt = vt + dt;
-			view.display(new ArrayList<Body>(balls), 0.1, j);
-		}
-
+	}
+	public void init(){
+		view = new SimulationViewer(620,620,this);
 	}
 
 	private static List<Body> generateBalls(final int n) {
@@ -63,5 +49,19 @@ public class BouncingBalls {
 			bodies.add(b);
 		}
 		return bodies;
+	}
+	
+	public void begin(){
+		for (Worker b : workers) {
+			b.start();
+		}
+		while (j++ <= nStep) {
+			context.hitBarrier();
+			vt = vt + dt;
+			view.display(new ArrayList<Body>(context.getBallList()), 0.1, j);
+		}
+	}
+	public void stop(){
+		context.setStop(true);
 	}
 }

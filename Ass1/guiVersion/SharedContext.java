@@ -17,6 +17,7 @@ public final class SharedContext {
 	private static final double dt = 0.1;
 	private static final int SEMAPHORE_PERMITS = 1;
 	private static final int THREADS = 3;//Runtime.getRuntime().availableProcessors() + 1 ;
+	private boolean stop = false;
 	//Used to divide balls correctly between threads
 	private boolean isOdd;
 	//Number of threads available
@@ -202,6 +203,12 @@ public final class SharedContext {
 	
 	public void resetPrint(){
 		printreset = true;
+	}
+	public void setStop(final boolean val){
+		stop = val;
+	}
+	public boolean getStop(){
+		return stop;
 	}
 
 }
