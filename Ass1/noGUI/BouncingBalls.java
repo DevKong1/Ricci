@@ -9,20 +9,17 @@ public class BouncingBalls {
 
 	public static void main(String []args) {
 
-		int nWorkers = 3;
-		int nBalls = 100;
-		int nStep = 500;
 		SharedContext context = SharedContext.getIstance();
 		// Two indexes used to split balls between threads
 		int perThread;
 		int tmp = 0;
-		List<Body> balls = generateBalls(nBalls);
+		List<Body> balls = generateBalls(SharedContext.getNballs());
 		// A shared context with which threads will coordinate
 		context.setBallList(balls);
 		List<Worker> workers = new ArrayList<Worker>();
-		for (int i = 0; i < nWorkers; i++) {
+		for (int i = 0; i < SharedContext.getWorkers(); i++) {
 			perThread = context.getBallsPerThread();
-			workers.add(new Worker("Worker-" + i, nStep, context, tmp, tmp += perThread));
+			workers.add(new Worker("Worker-" + i, SharedContext.getNsteps(), context, tmp, tmp += perThread));
 		}
 
 		for (Worker w : workers) {

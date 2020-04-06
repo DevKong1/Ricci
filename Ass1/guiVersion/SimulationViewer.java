@@ -46,13 +46,13 @@ public class SimulationViewer extends JFrame {
             	game.begin();
         	}).start();
         });
-        start.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        start.setAlignmentX(Component.CENTER_ALIGNMENT);
         stop.addActionListener(e -> {
         	new Thread(() ->{
             	game.stop();
         	}).start();
         });
-        stop.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        stop.setAlignmentX(Component.CENTER_ALIGNMENT);
         p.add(Box.createRigidArea(new Dimension(0,10)));
         p.add(start);
         p.add(stop);

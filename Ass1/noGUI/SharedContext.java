@@ -16,7 +16,9 @@ public final class SharedContext {
 	private static final double Y1 = 1.0;
 	private static final double dt = 0.1;
 	private static final int SEMAPHORE_PERMITS = 1;
-	private static final int THREADS = 3;//Runtime.getRuntime().availableProcessors() + 1 ;
+	private static final int NBALLS = 100;
+	private static final int NSTEPS = 500;
+	private static int THREADS;
 	//Used to divide balls correctly between threads
 	private boolean isOdd;
 	//Number of threads available
@@ -40,6 +42,7 @@ public final class SharedContext {
 	
 	// Private constructor for Singleton
 	private SharedContext() {
+		THREADS = Runtime.getRuntime().availableProcessors();
 		barrier = new CyclicBarrier(THREADS);
 		bounds = new Boundary(X0,Y0,X1,Y1);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
@@ -202,6 +205,14 @@ public final class SharedContext {
 	
 	public void resetPrint(){
 		printreset = true;
+	}
+	
+	public static int getNballs() {
+		return NBALLS;
+	}
+	
+	public static int getNsteps() {
+		return NSTEPS;
 	}
 
 }

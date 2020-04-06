@@ -58,7 +58,7 @@ public class BouncingBalls {
 		while (j++ <= nStep) {
 			context.hitBarrier();
 			vt = vt + dt;
-			view.display(new ArrayList<Body>(context.getBallList()), 0.1, j);
+			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
 		}
 	}
 	public void stop(){
