@@ -41,7 +41,7 @@ public final class SharedContext {
 		barrier = new CyclicBarrier(THREADS);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
 		matrix = new SharedCollisionsMatrix();
-		ticketSemaphore = new TicketSemaphore(THREADS);
+		ticketSemaphore = new TicketSemaphore(THREADS +1);
 		guiSemaphore = new CyclicBarrier(THREADS+1);
 	}
 
