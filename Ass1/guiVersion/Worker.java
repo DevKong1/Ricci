@@ -141,7 +141,7 @@ public class Worker extends Thread {
 				}
 				context.releaseBall(i);
 			}
-			k = (k + size) >= limit ? size : k + size;
+			k = (k + size) >= limit ? 0 : k + size;
 			maxExternalRange = (maxExternalRange + size) >= limit? size : maxExternalRange + size;
 		}
 
