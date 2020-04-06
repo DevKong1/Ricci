@@ -1,7 +1,6 @@
 package guiVersion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -13,9 +12,9 @@ public class BouncingBalls {
 	private int j = 1;
 	private double vt = 0;
 	private double dt = 0.1;
-	List<Worker> workers;
+	private List<Worker> workers;
 
-	public BouncingBalls(final int nWorkers, final int nBalls, final int nStep) {
+	public BouncingBalls(final int nBalls, final int nStep) {
 		this.nStep = nStep;
 		context = SharedContext.getIstance();
 		workers = new ArrayList<Worker>();
@@ -27,15 +26,47 @@ public class BouncingBalls {
 		// A shared context with which threads will coordinate
 		context.setBallList(balls);
 
-		for (int i = 0; i < nWorkers; i++) {
+		for (int i = 0; i < SharedContext.getWorkers(); i++) {
 			perThread = context.getBallsPerThread();
-			workers.add(new Worker("Worker-" + i, nStep, context, tmp, tmp += perThread));
+			workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
 		}
 	}
+	
 	public void init(){
 		view = new SimulationViewer(620,620,this);
 	}
 
+	
+	public void begin(){
+		long c = System.currentTimeMillis();
+		for (Worker b : workers) {
+			b.start();
+		}
+		while (j++ <= nStep) {
+			context.hitBarrier();
+			vt = vt + dt;
+			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
+			context.getMatrix().reset();
+		}
+		stop();
+		long d = System.currentTimeMillis();
+		System.out.println(d-c);
+		
+		for(Worker b : workers){
+			try {
+				b.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(true){
+			System.out.println("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEY "+(d-c));
+		}
+	}
+	public void stop(){
+		context.setStop(true);
+	}
+	
 	private static List<Body> generateBalls(final int n) {
 		Boundary bounds = new Boundary(-1.0, -1.0, 1.0, 1.0);
 		Random rand = new Random(System.currentTimeMillis());
@@ -49,19 +80,5 @@ public class BouncingBalls {
 			bodies.add(b);
 		}
 		return bodies;
-	}
-	
-	public void begin(){
-		for (Worker b : workers) {
-			b.start();
-		}
-		while (j++ <= nStep) {
-			context.hitBarrier();
-			vt = vt + dt;
-			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
-		}
-	}
-	public void stop(){
-		context.setStop(true);
 	}
 }

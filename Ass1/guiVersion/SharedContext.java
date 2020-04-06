@@ -14,11 +14,11 @@ public final class SharedContext {
 	private static final double Y0 = -1.0;
 	private static final double X1 = 1.0;
 	private static final double Y1 = 1.0;
-	private static final double dt = 0.1;
 	private static final int SEMAPHORE_PERMITS = 1;
-	private static final int NBALLS = 100;
-	private static final int NSTEPS = 10000;
-	private static int THREADS;
+	private static final int THREADS = 4;//Runtime.getRuntime().availableProcessors() + 1 ;
+	private static final Boundary BOUNDS = new Boundary(X0,Y0,X1,Y1);
+	
+	
 	private boolean stop = false;
 	//Used to divide balls correctly between threads
 	private boolean isOdd;
@@ -31,21 +31,14 @@ public final class SharedContext {
 	private TicketSemaphore ticketSemaphore;
 	
 	private Vector<Semaphore> collisionSemaphore;
-	private Boundary bounds;
-	
 	private SharedCollisionsMatrix matrix; //matrix to check if a collision has already been solved
-
-	//boolean used to updatepositions only once each step
-	private Boolean canUpdate = true;
 	
 	//TESING VARIABLE TODO DELETE
 	private Boolean printreset = true;
 	
 	// Private constructor for Singleton
 	private SharedContext() {
-		THREADS = Runtime.getRuntime().availableProcessors();
 		barrier = new CyclicBarrier(THREADS);
-		bounds = new Boundary(X0,Y0,X1,Y1);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
 		matrix = new SharedCollisionsMatrix();
 		ticketSemaphore = new TicketSemaphore(THREADS);
@@ -127,6 +120,8 @@ public final class SharedContext {
 		
 		if(balls.size() % THREADS  != 0) {
 			isOdd = true;
+		}else{
+			isOdd = false;
 		}
 	}
 
@@ -140,8 +135,8 @@ public final class SharedContext {
 	}
 	
 	//Returns map boundaries
-	public Boundary getBounds(){
-		return this.bounds;
+	public static Boundary getBounds(){
+		return BOUNDS;
 	}
 	
 	//Returns collision Matrix
@@ -162,25 +157,6 @@ public final class SharedContext {
 	}
 	public static int getWorkers(){
 		return THREADS;
-	}
-	
-	/**
-	 * Update Positions methods
-	 *
-	 */
-	public void updatePositions(){
-		if(!canUpdate) {
-			return;
-		}
-		
-		for (Body b: balls) {
-    		b.updatePos(dt);
-	    }	
-		canUpdate = false;
-	}
-	
-	public void resetUpdate(){
-		canUpdate = true;
 	}
 	
 	/**
@@ -212,14 +188,6 @@ public final class SharedContext {
 	}
 	public boolean getStop(){
 		return stop;
-	}
-	
-	public static int getNballs() {
-		return NBALLS;
-	}
-	
-	public static int getNsteps() {
-		return NSTEPS;
 	}
 
 }

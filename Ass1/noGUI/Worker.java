@@ -33,7 +33,6 @@ public class Worker extends Thread {
 			//DEBUG TODO delete
 			log(""+i);
 			//context.resetPrint();
-			context.resetUpdate();
 			
 			threadBalls.forEach(x -> x.updatePos(dt));
 			checkAndSolveInternalCollisions();
@@ -47,8 +46,6 @@ public class Worker extends Thread {
 			}
 			z=0;		
 			System.out.println("\n");  */
-			
-			
 			updateGlobalList();
 			//DEBUG :  new x positions
 			/*log("After Updating Pos");
@@ -73,15 +70,6 @@ public class Worker extends Thread {
 			
 			context.lockUpdateSem();
 			updateGlobalList();
-			context.releaseUpdateSem();	
-			
-			context.waitNonConcurrentCalc();
-
-			//DEBUG TODO delete
-			context.lockUpdateSem();
-			//context.printMatrix();
-			context.updatePositions();
-			context.getMatrix().reset();
 			context.releaseUpdateSem();	
 			
 			context.waitNonConcurrentCalc();

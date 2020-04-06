@@ -20,7 +20,11 @@ import javax.swing.*;
  */
 public class SimulationViewer extends JFrame {
     
-    private VisualiserPanel panel;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private VisualiserPanel panel;
     private Container p;
     private BouncingBalls game;
     /**
@@ -44,21 +48,22 @@ public class SimulationViewer extends JFrame {
         start.addActionListener(e -> {
         	new Thread(() ->{
             	game.begin();
+            	this.setVisible(false);;
         	}).start();
         });
-        start.setAlignmentX(Component.CENTER_ALIGNMENT);
+        start.setAlignmentX(Component.RIGHT_ALIGNMENT);
         stop.addActionListener(e -> {
         	new Thread(() ->{
             	game.stop();
         	}).start();
         });
-        stop.setAlignmentX(Component.CENTER_ALIGNMENT);
+        stop.setAlignmentX(Component.RIGHT_ALIGNMENT);
         p.add(Box.createRigidArea(new Dimension(0,10)));
         p.add(start);
         p.add(stop);
         p.add(Box.createRigidArea(new Dimension(0,10)));
         p.add(panel);
-        addWindowListener(new WindowAdapter(){
+        myFrame.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent ev){
 				System.exit(-1);
 			}
@@ -74,10 +79,13 @@ public class SimulationViewer extends JFrame {
 	}
     public static class VisualiserPanel extends JPanel {
         
-    	private ArrayList<Body> bodies = new ArrayList<Body>();
+    	/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private ArrayList<Body> bodies = new ArrayList<Body>();
     	private long nIter;
     	private double vt;
-    	private double energy;
     	
         private long dx;
         private long dy;

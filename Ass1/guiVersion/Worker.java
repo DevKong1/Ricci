@@ -6,7 +6,6 @@ import java.util.List;
 public class Worker extends Thread {
 
 	private final SharedContext context;
-	private final int nSteps;
 	private List<Body> threadBalls;
 	private final int start;
 	private final int lastIndex;
@@ -18,9 +17,8 @@ public class Worker extends Thread {
 	 * threadBalls: balls assigned to this thread 
 	 * allballs: every ball in the game
 	 */
-	public Worker(final String name, final int nSteps, final SharedContext context, final int start, final int lastlIndex) {
+	public Worker(final String name, final SharedContext context, final int start, final int lastlIndex) {
 		super(name);
-		this.nSteps = nSteps;
 		this.context = context;		
 		this.start = start;
 		this.lastIndex = lastlIndex;
@@ -29,11 +27,10 @@ public class Worker extends Thread {
 
 	public void run() {
 		int i = 0;
-		while(i++ < nSteps && !context.getStop()) {
+		while(i++ < SharedContext.getWorkers() && !context.getStop()) {
 			//DEBUG TODO delete
 			log(""+i);
 			//context.resetPrint();
-			context.resetUpdate();
 			
 			threadBalls.forEach(x -> x.updatePos(dt));
 			checkAndSolveInternalCollisions();
@@ -51,19 +48,10 @@ public class Worker extends Thread {
 			context.waitNonConcurrentCalc();
 		
 			// System.out.println()
-			threadBalls.stream().forEach(x -> x.checkAndSolveBoundaryCollision(context.getBounds()));
+			threadBalls.stream().forEach(x -> x.checkAndSolveBoundaryCollision(SharedContext.getBounds()));
 			
 			context.lockUpdateSem();
 			updateGlobalList();
-			context.releaseUpdateSem();	
-			
-			context.waitNonConcurrentCalc();
-
-			//DEBUG TODO delete
-			context.lockUpdateSem();
-			//context.printMatrix();
-			context.updatePositions();
-			context.getMatrix().reset();
 			context.releaseUpdateSem();	
 			
 			context.waitNonConcurrentCalc();

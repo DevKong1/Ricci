@@ -1,11 +1,14 @@
 package guiVersion;
 
 public class Game {
-	
-	private static SharedContext context;
 
 	public static void main(String[] args) {
-		new BouncingBalls(SharedContext.getWorkers(), SharedContext.getNballs(), SharedContext.getNsteps()).init();
+		//int threads = 4;
+		int steps = 1000;
+		int balls = 1000;
+		new BouncingBalls(balls,steps).init();
+				
+
 	}
 
 }
