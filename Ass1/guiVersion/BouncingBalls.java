@@ -46,7 +46,7 @@ public class BouncingBalls {
 			context.hitBarrier();
 			vt = vt + dt;
 			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
-			context.getMatrix().reset();
+			//context.getMatrix().reset();
 		}
 		stop();
 		long d = System.currentTimeMillis();
@@ -58,9 +58,6 @@ public class BouncingBalls {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
-		if(true){
-			System.out.println("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEY "+(d-c));
 		}
 	}
 	public void stop(){

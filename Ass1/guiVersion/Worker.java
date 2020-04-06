@@ -26,10 +26,8 @@ public class Worker extends Thread {
 	}
 
 	public void run() {
-		int i = 0;
-		while(i++ < SharedContext.getWorkers() && !context.getStop()) {
+		while(!context.getStop()) {
 			//DEBUG TODO delete
-			log(""+i);
 			//context.resetPrint();
 			
 			threadBalls.forEach(x -> x.updatePos(dt));

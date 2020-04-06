@@ -131,7 +131,7 @@ public class Worker extends Thread {
     			//log("Got " + j);
     			
         		//check if the collision has already been solved
-	        	if(!context.getMatrix().checkAndSet(k, j)) {
+	        	//if(!context.getMatrix().checkAndSet(k, j)) {
 		        	Body b2 = context.getBallList().get(j);
 		        	
 		            if (b1.collideWith(b2)) {		
@@ -148,7 +148,7 @@ public class Worker extends Thread {
 		            	
 		            	//log("two balls are colliding at X:"+b1.getPos().getX()+", y="+b1.getPos().getY() +" Y:"+b2.getPos().getX()+", y="+b2.getPos().getY()+" VEL1: x:"+b1.getVel().getX() +"y:"+b1.getVel().getY()+" VEL2: x:"+b2.getVel().getX() +"y:"+b2.getVel().getY()+"\n");
 		            }
-	            }
+	            //}
 	        	
     			//log("Releasing  " + j);
     			context.releaseBall(j);		          			
