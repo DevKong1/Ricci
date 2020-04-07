@@ -42,16 +42,16 @@ public class Worker extends Thread {
 
 			checkAndSolveExternalCollisions();
 
-			//context.waitNonConcurrentCalc();
+			context.waitNonConcurrentCalc();
 			//threadBalls = new ArrayList<Body>(context.getBallList().subList(start, lastIndex));
 
 			// System.out.println()
 
-			context.lockUpdateSem();
+			/*context.lockUpdateSem();
 			updateGlobalList();
-			context.releaseUpdateSem();
+			context.releaseUpdateSem();*/
 			
-			checkAndSolveExternalCollisions();
+			//checkAndSolveExternalCollisions();
 			threadBalls.stream().forEach(x -> x.checkAndSolveBoundaryCollision(SharedContext.getBounds()));
 			context.lockUpdateSem();
 			updateGlobalList();
@@ -77,26 +77,33 @@ public class Worker extends Thread {
 	}
 
 	private void updateGlobalList() {
+		int k = start;
 		for (int m = 0; m < threadBalls.size(); m++) {
-			int k = start;
 			context.updateBallList(threadBalls.get(m), k++);
 		}
 	}
 
 	private void checkAndSolveExternalCollisions() {
-		List<Body> tmp = context.getBallList();
+		List<Body> tmp = new ArrayList<>();
 	    for (int i = 0; i < threadBalls.size() - 1; i++) {
-	    	Body b1 = threadBalls.get(i);
+	    	tmp = new ArrayList<>(context.getBallList());
+	    	Body b1 = tmp.get(i);
 	        for (int j = i + 1; j < tmp.size(); j++) {
 	        	Body b2 = tmp.get(j);
 	            if (b1.collideWith(b2)) {
 	            	Body.solveCollision(b1, b2);
-	            	System.out.println(i + " Local Velocity:" + b1.getVel().getX() + "  ---- " + b1.getVel().getY());	   
-	            	System.out.println(j + " Local Velocity:" + b2.getVel().getX() + "  ---- " + b2.getVel().getY());	
+	            	threadBalls = tmp.subList(start, lastIndex);
+	            	//context.lockUpdateSem();
+	            	context.lockBall(j);
+	            	updateGlobalList();
+	            	context.releaseBall(j);
+	            	//context.releaseUpdateSem();
+	            	//System.out.println(i + " Local Velocity:" + b1.getVel().getX() + "  ---- " + b1.getVel().getY());	   
+	            	//System.out.println(j + " Local Velocity:" + b2.getVel().getX() + "  ---- " + b2.getVel().getY());	
 	            }
 	        }
         }
-	    threadBalls = tmp.subList(start, lastIndex);
+	    
 		/*
 		 * // get ticket to avoid deadlock
 		log("WaitTicket...");
