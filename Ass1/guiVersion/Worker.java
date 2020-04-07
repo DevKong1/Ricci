@@ -124,9 +124,9 @@ public class Worker extends Thread {
 			 maxExternalRange = lastIndex+size;
 		}
 
-		while (j++ < SharedContext.getWorkers()) {
+		while (j++ < SharedContext.getWorkers()-1) {
 
-			for (; i < maxInternalRange; i++) {
+			for (i=start; i < maxInternalRange; i++) {
 				context.waitNonConcurrentCalc();
 				context.lockBall(i);
 				Body b1 = context.getBallList().get(i);
@@ -138,11 +138,16 @@ public class Worker extends Thread {
 						Body.solveCollision(b1, b2);
 					}
 					context.releaseBall(k);
+					log("Locked my ball "+i +" and checked collision with "+k );
 				}
 				context.releaseBall(i);
+
 			}
-			k = (k + size) >= limit ? 0 : k + size;
-			maxExternalRange = (maxExternalRange + size) >= limit? size : maxExternalRange + size;
+			k = maxExternalRange+1;		
+			maxExternalRange = (maxExternalRange + size) >= limit+1? size : maxExternalRange + size;
+			if(j == SharedContext.getWorkers() -3){
+				log("HELLOOO");
+			}
 		}
 
 	}
