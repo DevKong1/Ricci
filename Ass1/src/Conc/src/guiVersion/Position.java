@@ -1,15 +1,15 @@
-package pcd.ass01.seq;
+package guiVersion;
 
 public class Position { 
 
     private double x, y;
 
-    public Position(double x,double y){
+    public Position(final double x, final double y){
         this.x = x;
         this.y = y;
     }
 
-    public void change(double x, double y){
+    public void change(final double x, final double y){
     	this.x = x;
     	this.y = y;
     }
