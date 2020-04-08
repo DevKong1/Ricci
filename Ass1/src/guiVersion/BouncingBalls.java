@@ -51,7 +51,7 @@ public class BouncingBalls {
 		stop();
 		long d = System.currentTimeMillis();
 		for(int i = 0;i<100;i++){
-			System.out.println("UYOOOOOOOOOOOOOOOOOOOOOOOOOO "+(d-c));
+			System.out.println(""+(d-c));
 		}
 
 		for(Worker b : workers){
