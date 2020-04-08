@@ -48,12 +48,9 @@ public class BouncingBalls {
 			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
 			//context.getMatrix().reset();
 		}
-		stop();
 		long d = System.currentTimeMillis();
-		for(int i = 0;i<100;i++){
-			System.out.println(""+(d-c));
-		}
-
+		System.out.println(""+(d-c));
+		stop();
 		for(Worker b : workers){
 			try {
 				b.join();
@@ -62,6 +59,7 @@ public class BouncingBalls {
 			}
 		}
 	}
+	
 	public void stop(){
 		context.setStop(true);
 	}
