@@ -1,4 +1,4 @@
-package src.noGUI;
+package src.noguiVersion;
 
 import java.util.*;
 
@@ -16,6 +16,10 @@ public class Body {
         this.pos = pos;
         this.vel = vel;
         this.radius = radius;
+    }
+    
+    public Body(final Body copy) {
+    	this(copy.getPos(), copy.getVel(), copy.getRadius());
     }
     
     public double getRadius() {

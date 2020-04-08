@@ -7,7 +7,7 @@
  * Use is subject to license terms.
  *
  */
-package src.noGUI;
+package src.noguiVersion;
 
 /**
  *

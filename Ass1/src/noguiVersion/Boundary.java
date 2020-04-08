@@ -1,4 +1,4 @@
-package src.noGUI;
+package src.noguiVersion;
 
 /**
  * Boundary of the field where bodies move. 
