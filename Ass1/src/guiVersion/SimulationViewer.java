@@ -12,26 +12,22 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import javax.swing.*;
 
-
-/**
- * Simulation view
- * @author aricci
- *
- */
+//Class for simulate the GUI of BouncingBalls
 public class SimulationViewer extends JFrame {
     
-    /**
-	 * 
-	 */
+	//Variable for layout of the GUI
 	private static final long serialVersionUID = 1L;
 	private VisualiserPanel panel;
     private Container p;
     private BouncingBalls game;
+    
     /**
      * Creates a view of the specified size (in pixels)
      * @param w
      * @param h
      */
+    
+    //Constructor of SimulationViewer
     public SimulationViewer(int w, int h, BouncingBalls controller){
     	this.game = controller;
     	setTitle("Bodies Simulation");
@@ -74,9 +70,12 @@ public class SimulationViewer extends JFrame {
         myFrame.getContentPane().add(p);
         myFrame.setVisible(true);
     }
+    //Method for display GUI
 	public void display(ArrayList<Body> bodies, double vt, long iter) {
 				panel.display(bodies, vt, iter);
 	}
+	
+	//Class for create Panel with all balls
     public static class VisualiserPanel extends JPanel {
         
     	/**
@@ -90,12 +89,14 @@ public class SimulationViewer extends JFrame {
         private long dx;
         private long dy;
         
+        //Constructor with: width and height of panel
         public VisualiserPanel(int w, int h){
             setSize(w,h);
             dx = w/2 - 20;
             dy = h/2 - 20;
         }
 
+        //Method for paint all the balls
         public void paint(Graphics g){
     		Graphics2D g2 = (Graphics2D) g;
     		
@@ -116,6 +117,7 @@ public class SimulationViewer extends JFrame {
     		g2.drawString("Bodies: " + bodies.size() + " - vt: " + time + " - nIter: " + nIter, 2, 20);
         }
         
+        //Method who display all balls into the GUI
         public void display(ArrayList<Body> bodies, double vt, long iter){
             this.bodies = bodies;
             this.vt = vt;
