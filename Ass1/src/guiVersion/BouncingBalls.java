@@ -11,7 +11,7 @@ public class BouncingBalls {
 	private SimulationViewer view;
 	private int j = 1;
 	private double vt = 0;
-	private double dt = 0.1;
+	private double dt = 0.01;
 	private List<Worker> workers;
 
 	public BouncingBalls(final int nBalls, final int nStep) {

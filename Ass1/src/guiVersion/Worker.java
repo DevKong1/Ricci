@@ -1,6 +1,7 @@
 package src.guiVersion;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -60,10 +61,7 @@ public class Worker extends Thread {
 	private void checkAndSolveCollisions() {
 		
 		//instantiate a copy of the global ball list
-		List<Body> tmp = new ArrayList<>();
-		context.lockUpdateSem();
-    	tmp = new ArrayList<>(context.getBallList());
-    	context.releaseUpdateSem();
+		List<Body> tmp = context.getBallList();
     	
     	//for each assigned ball
 	    for (int i = start; i < lastIndex - 1; i++) {	    	
