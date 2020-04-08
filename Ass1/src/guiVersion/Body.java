@@ -18,6 +18,10 @@ public class Body {
         this.radius = radius;
     }
     
+    public Body(final Body copy) {
+    	this(copy.getPos(), copy.getVel(), copy.getRadius());
+    }
+    
     public double getRadius() {
     	return radius;
     }

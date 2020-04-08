@@ -112,6 +112,17 @@ public class Worker extends Thread {
 			context.updateBallList(threadBalls.get(m), k++);
 		}
 	}
+	
+	private void updateAfterCollision(Body b1, Body b2, int i, int j) {
+		context.updateBallList(b1, i);
+		context.updateBallList(b2, j);
+	}
+	
+	private void updateLocalVariables(List<Body> tmp, Body b1, Body b2, int i, int j) {
+    	threadBalls.set(i-start, b1);
+    	tmp.set(i, b1);
+    	tmp.set(j, b2);
+	}
 
 	private void checkAndSolveExternalCollisions() {
 		List<Body> tmp = new ArrayList<>();
@@ -119,15 +130,15 @@ public class Worker extends Thread {
     	tmp = new ArrayList<>(context.getBallList());
     	context.releaseUpdateSem();
 	    for (int i = start; i < lastIndex - 1; i++) {
-	    	Body b1 = tmp.get(i);
+	    	Body b1 = new Body(tmp.get(i));
 	        for (int j = i+1; j < tmp.size(); j++) {
-	        	Body b2 = tmp.get(j);
+	        	Body b2 = new Body(tmp.get(j));
 	            if (b1.collideWith(b2)) {
 	            	Body.solveCollision(b1, b2);
-	            	threadBalls = tmp.subList(start, lastIndex);
+	            	updateLocalVariables(tmp, b1, b2, i, j);
 	            	context.lockUpdateSem();
 	            	//context.lockBall(j);
-	            	updateGlobalList();
+	            	updateAfterCollision(b1, b2, i, j);
 	            	//context.releaseBall(j);
 	            	context.releaseUpdateSem();
 	            	//System.out.println(i + " Local Velocity:" + b1.getVel().getX() + "  ---- " + b1.getVel().getY());	   
