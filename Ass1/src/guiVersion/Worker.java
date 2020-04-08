@@ -13,8 +13,10 @@ public class Worker extends Thread {
 	private final double dt = 0.1;
 
 	/*
-	 * name : thread name context: shared context threadBalls: balls assigned to
-	 * this thread allballs: every ball in the game
+	 * name : thread name 
+	 * context: shared context 
+	 * start: index of the first ball assigned to the thread (included)
+	 * lastIndex: index of the last ball assigned to the thread (not included)
 	 */
 	public Worker(final String name, final SharedContext context, final int start, final int lastlIndex) {
 		super(name);
@@ -26,60 +28,69 @@ public class Worker extends Thread {
 
 	public void run() {
 		while (!context.getStop()) {
-			// DEBUG TODO delete
-			// context.resetPrint();
 
-			//threadBalls.forEach(x -> x.updatePos(dt));
-
+			//each cycle move the balls according to its speed
 			updateInternalPos();
-			//checkAndSolveInternalCollisions();
-			/*context.lockUpdateSem();
-			updateGlobalList();
-			context.releaseUpdateSem();*/
+			context.waitNonConcurrentCalc();			
+			
+			//check and solve collisions assigned to the thread
+			checkAndSolveCollisions();
 			context.waitNonConcurrentCalc();
-			
-			//checkAndSolveInternalCollisions();
-			/*context.lockUpdateSem();
 
-			updateGlobalList();
-			context.releaseUpdateSem();*/
-
-			//context.waitNonConcurrentCalc();
-
-			//log("EXTERNAL COLLISIONS");
-
-			
-			checkAndSolveExternalCollisions();
-			context.waitNonConcurrentCalc();
-			//threadBalls = new ArrayList<Body>(context.getBallList().subList(start, lastIndex));
-
-			// System.out.println()
-
-			/*context.lockUpdateSem();
-			updateGlobalList();
-			context.releaseUpdateSem();*/
-			
-			//checkAndSolveExternalCollisions();
-			//threadBalls.stream().forEach(x -> x.checkAndSolveBoundaryCollision(SharedContext.getBounds()));
-			/*context.lockUpdateSem();
-			updateGlobalList();
-			context.releaseUpdateSem();*/
+			//check and solve boundary collisions
 			solveBoundaryCollision();
 			context.waitNonConcurrentCalc();
 			context.hitBarrier();
 		}
 	}
 	
-
+	//method to move each assigned ball accordingly to its velocity
 	private void updateInternalPos() {
+		
 		for(int i = 0; i < threadBalls.size(); i++) {
 			threadBalls.get(i).updatePos(dt);
 		}
+		
 		context.lockUpdateSem();
 		updateGlobalList();
 		context.releaseUpdateSem();
 	}
 	
+	//method to check and solve collisions relative to balls assigned to the thread
+	private void checkAndSolveCollisions() {
+		
+		//instantiate a copy of the global ball list
+		List<Body> tmp = new ArrayList<>();
+		context.lockUpdateSem();
+    	tmp = new ArrayList<>(context.getBallList());
+    	context.releaseUpdateSem();
+    	
+    	//for each assigned ball
+	    for (int i = start; i < lastIndex - 1; i++) {	    	
+	    	Body b1 = new Body(tmp.get(i));
+	    	
+	    	//for each subsequent ball
+	        for (int j = i+1; j < tmp.size(); j++) {        	
+	        	Body b2 = new Body(tmp.get(j));
+	        	
+	            if (b1.collideWith(b2)) {            	
+	            	Body.solveCollision(b1, b2);
+	            	threadBalls.set(i-start, b1);
+	            	context.lockUpdateSem();
+	            	updateAfterCollision(b1, b2, i, j);
+	            	context.releaseUpdateSem();
+	            }
+	        }
+        }
+	}
+	
+	//update global ball list
+	private void updateAfterCollision(Body b1, Body b2, int i, int j) {
+		context.updateBallList(b1, i);
+		context.updateBallList(b2, j);
+	}
+	
+	//check and directly update local collisions
 	private void solveBoundaryCollision() {
 		for(int i = 0; i < threadBalls.size(); i++) {
 			threadBalls.get(i).checkAndSolveBoundaryCollision(SharedContext.getBounds());
@@ -89,181 +100,11 @@ public class Worker extends Thread {
 		context.releaseUpdateSem();
 	}
 
-	// Checks if there are any collisions between balls handled by a SINGLE
-	// thread, if so, it solves them.
-	private void checkAndSolveInternalCollisions() {
-		for (int k = 0; k < threadBalls.size() - 1; k++) {
-			Body b1 = threadBalls.get(k);
-			for (int j = k + 1; j < threadBalls.size(); j++) {
-				Body b2 = threadBalls.get(j);
-				if (b1.collideWith(b2)) {
-					Body.solveCollision(b1, b2);
-				}
-			}
-		}
-		context.lockUpdateSem();
-		updateGlobalList();
-		context.releaseUpdateSem();
-	}
-
+	//set the global list to match our local
 	private void updateGlobalList() {
 		int k = start;
 		for (int m = 0; m < threadBalls.size(); m++) {
 			context.updateBallList(threadBalls.get(m), k++);
-		}
-	}
-	
-	private void updateAfterCollision(Body b1, Body b2, int i, int j) {
-		context.updateBallList(b1, i);
-		context.updateBallList(b2, j);
-	}
-	
-	private void updateLocalVariables(List<Body> tmp, Body b1, Body b2, int i, int j) {
-    	threadBalls.set(i-start, b1);
-    	tmp.set(i, b1);
-    	tmp.set(j, b2);
-	}
-
-	private void checkAndSolveExternalCollisions() {
-		List<Body> tmp = new ArrayList<>();
-		context.lockUpdateSem();
-    	tmp = new ArrayList<>(context.getBallList());
-    	context.releaseUpdateSem();
-	    for (int i = start; i < lastIndex - 1; i++) {
-	    	Body b1 = new Body(tmp.get(i));
-	        for (int j = i+1; j < tmp.size(); j++) {
-	        	Body b2 = new Body(tmp.get(j));
-	            if (b1.collideWith(b2)) {
-	            	Body.solveCollision(b1, b2);
-	            	updateLocalVariables(tmp, b1, b2, i, j);
-	            	context.lockUpdateSem();
-	            	//context.lockBall(j);
-	            	updateAfterCollision(b1, b2, i, j);
-	            	//context.releaseBall(j);
-	            	context.releaseUpdateSem();
-	            	//System.out.println(i + " Local Velocity:" + b1.getVel().getX() + "  ---- " + b1.getVel().getY());	   
-	            	//System.out.println(j + " Local Velocity:" + b2.getVel().getX() + "  ---- " + b2.getVel().getY());	
-	            }
-	        }
-        }
-		/*checkAndSolveInternalCollisions();
-		leftCheckCollision();
-		rightCheckCollision();*/
-	    
-		/*
-		 * // get ticket to avoid deadlock
-		log("WaitTicket...");
-		context.getTicketAndWait();
-		log("Got ticket");
-
-		rightCheck();
-
-		context.releaseTicket();
-		log("Released ticket");*/
-	}
-	
-	private void rightCheckCollision() {
-		List<Body> tmp = new ArrayList<>();
-		context.lockUpdateSem();
-    	tmp = new ArrayList<>(context.getBallList());
-    	context.releaseUpdateSem();
-		for (int i = start; i < lastIndex - 1; i++) {
-	    	Body b1 = tmp.get(i);
-	        for (int j = lastIndex; j < tmp.size(); j++) {
-	        	Body b2 = tmp.get(j);
-	            if (b1.collideWith(b2)) {
-	            	Body.solveCollision(b1, b2);
-	        		threadBalls = new ArrayList<>(tmp.subList(start, lastIndex));
-	            	context.lockUpdateSem();
-	            	//context.lockBall(j);
-	            	updateGlobalList();
-	            	//context.releaseBall(j);
-	            	context.releaseUpdateSem();
-	            	//System.out.println(i + " Local Velocity:" + b1.getVel().getX() + "  ---- " + b1.getVel().getY());	   
-	            	//System.out.println(j + " Local Velocity:" + b2.getVel().getX() + "  ---- " + b2.getVel().getY());	
-	            }
-	        }
-        }
-	}
-	
-	private void leftCheckCollision() {
-		List<Body> tmp = new ArrayList<>();
-		context.lockUpdateSem();
-    	tmp = new ArrayList<>(context.getBallList());
-    	context.releaseUpdateSem();
-		for (int i = start; i < lastIndex - 1; i++) {
-	    	Body b1 = tmp.get(i);
-	        for (int j = 0; j < start; j++) {
-	        	Body b2 = tmp.get(j);
-	            if (b1.collideWith(b2)) {
-	            	Body.solveCollision(b1, b2);
-	            	threadBalls = new ArrayList<>(tmp.subList(start, lastIndex));
-	            	context.lockUpdateSem();
-	            	//context.lockBall(j);
-	            	updateGlobalList();
-	            	//context.releaseBall(j);
-	            	context.releaseUpdateSem();
-	            	//System.out.println(i + " Local Velocity:" + b1.getVel().getX() + "  ---- " + b1.getVel().getY());	   
-	            	//System.out.println(j + " Local Velocity:" + b2.getVel().getX() + "  ---- " + b2.getVel().getY());	
-	            }
-	        }
-        }
-	}
-
-	/*private void rightCheck() {
-		int size = threadBalls.size();
-		int limit = context.getBallList().size();
-		int pos = Integer.parseInt(getName().substring(getName().length()-1)) +1 ;
-		int maxInternalRange = threadBalls.size()*pos;
-		int maxExternalRange;
-		int i = start;
-		int k;
-		int j = 0;
-		
-		if (lastIndex >= context.getBallList().size()) {
-			k = 1;
-			maxExternalRange = size-1;
-		} else {
-			k = lastIndex + 1;
-			 maxExternalRange = lastIndex+size;
-		}
-
-		while (j++ < SharedContext.getWorkers()-1) {
-
-			for (i=start; i < maxInternalRange; i++) {
-				context.waitNonConcurrentCalc();
-				context.lockBall(i);
-				Body b1 = context.getBallList().get(i);
-				for (; k < maxExternalRange ; k++) {
-					context.waitNonConcurrentCalc();
-					context.lockBall(k);
-					Body b2 = context.getBallList().get(k);
-					if (b1.collideWith(b2)) {
-						Body.solveCollision(b1, b2);
-					}
-					context.releaseBall(k);
-					log("Locked my ball "+i +" and checked collision with "+k );
-				}
-				context.releaseBall(i);
-				
-				if (lastIndex >= context.getBallList().size()) {
-					k = 1;
-				} else {
-					k = lastIndex + 1;
-				}
-
-			}
-			k = maxExternalRange+1;		
-			maxExternalRange = (maxExternalRange + size) >= limit+1? size : maxExternalRange + size;
-			if(j == SharedContext.getWorkers() -3){
-				log("HELLOOO");
-			}
-		}
-
-	}*/
-	private void log(final String msg) {
-		synchronized (System.out) {
-			System.out.println("[ " + getName() + " ] " + msg);
 		}
 	}
 }
