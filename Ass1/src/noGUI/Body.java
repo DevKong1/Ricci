@@ -1,4 +1,4 @@
-package src.seq;
+package src.noGUI;
 
 import java.util.*;
 
@@ -12,7 +12,7 @@ public class Body {
     private Velocity vel;
     private double radius;
     
-    public Body(Position pos, Velocity vel, double radius){
+    public Body(final Position pos, final Velocity vel, final double radius){
         this.pos = pos;
         this.vel = vel;
         this.radius = radius;
@@ -35,7 +35,7 @@ public class Body {
      * 
      * @param dt time elapsed 
      */
-    public void updatePos(double dt){    	
+    public void updatePos(final double dt){    	
     	double newPosX = pos.getX() + vel.getX()*dt;
     	double newPosY = pos.getY() + vel.getY()*dt;
     	pos.change(newPosX, newPosY);
@@ -47,7 +47,7 @@ public class Body {
      * @param vx
      * @param vy
      */
-    public void changeVel(double vx, double vy){
+    public void changeVel(final double vx, final double vy){
     	vel.change(vx, vy);
     }
   	
@@ -57,7 +57,7 @@ public class Body {
      * @param b
      * @return
      */
-    public double getDistance(Body b) {
+    public double getDistance(final Body b) {
     	double dx = pos.getX() - b.getPos().getX();
     	double dy = pos.getY() - b.getPos().getY();
     	return Math.sqrt(dx*dx + dy*dy);
@@ -68,7 +68,7 @@ public class Body {
      * @param b
      * @return
      */
-    public boolean collideWith(Body b) {
+    public boolean collideWith(final Body b) {
     	double distance = getDistance(b);
     	return distance < radius + b.getRadius();
     }
@@ -119,7 +119,7 @@ public class Body {
     	double fact21 = (x21dx*v21dx + x21dy*v21dy) / (x21dx*x21dx + x21dy*x21dy);    	
     	double v2x = v2.getX() - x21dx*fact21;
     	double v2y = v2.getY() - x21dy*fact21;
-    	
+
     	b1.changeVel(v1x, v1y);
     	b2.changeVel(v2x, v2y);
     }

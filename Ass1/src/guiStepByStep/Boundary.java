@@ -1,4 +1,5 @@
-package src.seq;
+package src.guiStepByStep;
+
 /**
  * Boundary of the field where bodies move. 
  *
@@ -9,7 +10,7 @@ public class Boundary {
 	private double x1;
 	private double y1;
 
-	public Boundary(double x0, double y0, double x1, double y1){
+	public Boundary(final double x0, final double y0, final double x1, final double y1){
 		this.x0=x0;
 		this.y0=y0;
 		this.x1=x1;
