@@ -15,11 +15,12 @@ public class BouncingBalls {
 	private List<Worker> workers;
 
 	public BouncingBalls(final int nBalls, final int nStep) {
+		
 		this.nStep = nStep;
 		context = SharedContext.getIstance();
 		workers = new ArrayList<Worker>();
-		// Two indexes used to split balls between threads
 		
+		// Two indexes used to split balls between threads	
 		int perThread;
 		int tmp = 0;
 		List<Body> balls = generateBalls(nBalls);
@@ -32,25 +33,38 @@ public class BouncingBalls {
 		}
 	}
 	
+	/**
+     * Initialize the view
+     * @return
+     */
 	public void init(){
 		view = new SimulationViewer(620,620,this);
 	}
 
-	
+	/**
+     * Start the workers and wait for them to finish
+     * @return
+     */
 	public void begin(){
+		//used to measure the speedup
 		long c = System.currentTimeMillis();
+		
 		for (Worker b : workers) {
 			b.start();
 		}
+		
+		//each step update the time and display the balls
 		while (j++ <= nStep) {
 			context.hitBarrier();
 			vt = vt + dt;
 			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
-			//context.getMatrix().reset();
 		}
+		
+		stop();
+		//used to measure speedup
 		long d = System.currentTimeMillis();
 		System.out.println(""+(d-c));
-		stop();
+		
 		for(Worker b : workers){
 			try {
 				b.join();
@@ -60,6 +74,10 @@ public class BouncingBalls {
 		}
 	}
 	
+	/**
+     * Stops the execution
+     * @return
+     */
 	public void stop(){
 		context.setStop(true);
 	}

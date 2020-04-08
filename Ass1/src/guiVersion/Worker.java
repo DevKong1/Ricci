@@ -67,28 +67,25 @@ public class Worker extends Thread {
     	
     	//for each assigned ball
 	    for (int i = start; i < lastIndex - 1; i++) {	    	
-	    	Body b1 = new Body(tmp.get(i));
+	    	Body b1 = tmp.get(i);
 	    	
 	    	//for each subsequent ball
 	        for (int j = i+1; j < tmp.size(); j++) {        	
-	        	Body b2 = new Body(tmp.get(j));
+	        	Body b2 = tmp.get(j);
 	        	
-	            if (b1.collideWith(b2)) {            	
-	            	Body.solveCollision(b1, b2);
+	            if (b1.collideWith(b2)) {     
+	            	synchronized(b1) {
+	            		synchronized(b2) {
+	    	            	Body.solveCollision(b1, b2);	            			
+	            		}
+	            	}	            	
+	            	//update local and global variables            	
 	            	threadBalls.set(i-start, b1);
-	            	context.lockUpdateSem();
-	            	updateAfterCollision(b1, b2, i, j);
-	            	context.releaseUpdateSem();
 	            }
 	        }
         }
 	}
 	
-	//update global ball list
-	private void updateAfterCollision(Body b1, Body b2, int i, int j) {
-		context.updateBallList(b1, i);
-		context.updateBallList(b2, j);
-	}
 	
 	//check and directly update local collisions
 	private void solveBoundaryCollision() {
