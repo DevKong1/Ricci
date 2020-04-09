@@ -20,6 +20,7 @@ public final class SharedContext {
 	
 	//Used to divide balls correctly between threads
 	private boolean isOdd;
+	private boolean stop;
 	//Number of threads available
 	private List<Body> balls;
 	private CyclicBarrier barrier;
@@ -30,9 +31,10 @@ public final class SharedContext {
 	
 	// Private constructor for Singleton
 	private SharedContext() {
+		stop=false;
 		barrier = new CyclicBarrier(THREADS);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
-		controlSemaphore = new CyclicBarrier(THREADS);
+		controlSemaphore = new CyclicBarrier(THREADS+1);
 	}
 
 	// returns Singleton instance
@@ -127,6 +129,12 @@ public final class SharedContext {
 			return (balls.size() / THREADS) + (balls.size() % THREADS);
 		}
 		return balls.size() / THREADS;
+	}
+	public boolean getStop(){
+		return stop;
+	}
+	public void setStop(boolean val){
+		stop = val;
 	}
 	public static int getWorkers(){
 		return THREADS;

@@ -7,27 +7,42 @@ import java.util.Random;
 public class BouncingBalls {
 
 	public static void main(String[] args) {
-
-		int nWorkers = SharedContext.getWorkers();
+		/**
+		 * Input variables
+		 */
 		int nBalls = 100;
-		int nStep = 500;
+		int nStep = 1;
+
+		/**
+		 * Computational variables
+		 */
 		SharedContext context = SharedContext.getIstance();
-		// Two indexes used to split balls between threads
 		int perThread;
+		// Two indexes used to split balls between threads
 		int tmp = 0;
+		int counter = 0;
+		//Numbers of thread to be used
+		int nWorkers = SharedContext.getWorkers();
 		List<Body> balls = generateBalls(nBalls, SharedContext.getBounds());
 		// A shared context with which threads will coordinate
 		context.setBallList(balls);
 		List<Worker> workers = new ArrayList<Worker>();
 		for (int i = 0; i < nWorkers; i++) {
 			perThread = context.getBallsPerThread();
-			workers.add(new Worker("Worker-" + i, nStep, context, tmp, tmp += perThread));
+			workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
 		}
-
-		for (Worker w : workers) {
-			w.start();
+		if (nStep > 0) {
+			for (Worker w : workers) {
+				w.start();
+			}
+			while (!context.getStop()) {
+				context.hitBarrier();
+				if (counter++ == nStep) {
+					context.setStop(true);
+				}
+				context.hitBarrier();
+			}
 		}
-
 	}
 
 	private static List<Body> generateBalls(final int n, Boundary bound) {

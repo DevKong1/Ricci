@@ -11,7 +11,6 @@ public class Worker extends Thread {
 	private final int start;
 	private final int lastIndex;
 	private final double dt = 0.1;
-	private int nStep;
 
 	/*
 	 * name : thread name 
@@ -19,9 +18,8 @@ public class Worker extends Thread {
 	 * start: index of the first ball assigned to the thread (included)
 	 * lastIndex: index of the last ball assigned to the thread (not included)
 	 */
-	public Worker(final String name,final int nStep, final SharedContext context, final int start, final int lastlIndex) {
+	public Worker(final String name, final SharedContext context, final int start, final int lastlIndex) {
 		super(name);
-		this.nStep= nStep;
 		this.context = context;
 		this.start = start;
 		this.lastIndex = lastlIndex;
@@ -29,8 +27,7 @@ public class Worker extends Thread {
 	}
 
 	public void run() {
-		int j =0;
-		while (j++<nStep) {
+		while (!context.getStop()) {
 
 			//each cycle move the balls according to its speed
 			updateInternalPos();
@@ -43,6 +40,7 @@ public class Worker extends Thread {
 			//check and solve boundary collisions
 			solveBoundaryCollision();
 			context.waitNonConcurrentCalc();
+			context.hitBarrier();
 			context.hitBarrier();
 		}
 	}
