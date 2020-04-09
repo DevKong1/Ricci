@@ -1,4 +1,4 @@
-package src.noguiVersion;
+package noGUI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,70 +6,47 @@ import java.util.Random;
 
 public class BouncingBalls {
 
-	private int nStep;
-	private SharedContext context;
-	private int j = 1;
-	private double vt = 0;
-	private double dt = 0.01;
-	private List<Worker> workers;
+	public static void main(String[] args) {
+		/**
+		 * Input variables
+		 */
+		int nBalls = 100;
+		int nStep = 1;
 
-	public BouncingBalls(final int nBalls, final int nStep) {
-		
-		this.nStep = nStep;
-		context = SharedContext.getIstance();
-		context.setSteps(nStep);
-		workers = new ArrayList<Worker>();
-		
-		// Two indexes used to split balls between threads	
+		/**
+		 * Computational variables
+		 */
+		SharedContext context = SharedContext.getIstance();
 		int perThread;
+		// Two indexes used to split balls between threads
 		int tmp = 0;
-		List<Body> balls = generateBalls(nBalls);
+		int counter = 0;
+		//Numbers of thread to be used
+		int nWorkers = SharedContext.getWorkers();
+		List<Body> balls = generateBalls(nBalls, SharedContext.getBounds());
 		// A shared context with which threads will coordinate
 		context.setBallList(balls);
-
-		for (int i = 0; i < SharedContext.getWorkers(); i++) {
+		List<Worker> workers = new ArrayList<Worker>();
+		for (int i = 0; i < nWorkers; i++) {
 			perThread = context.getBallsPerThread();
 			workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
 		}
-	}
-	
-	/**
-     * Start the workers and wait for them to finish
-     * @return
-     */
-	public void begin(){
-		
-		for (Worker b : workers) {
-			b.start();
-		}
-		
-		//each step update the time and display the balls
-		while (j++ <= nStep) {
-			context.hitBarrier();
-			vt = vt + dt;
-		}
-		stop();
-		
-		for(Worker b : workers){
-			try {
-				b.join();
-				System.out.println("joined");
-			} catch (Exception e) {
-				e.printStackTrace();
+		if (nStep > 0) {
+			for (Worker w : workers) {
+				w.start();
+			}
+			while (!context.getStop()) {
+				context.hitBarrier();
+				if (counter++ == nStep) {
+					context.setStop(true);
+				}
+				context.hitBarrier();
 			}
 		}
 	}
-	
-	/**
-     * Stops the execution
-     * @return
-     */
-	public void stop(){
-		context.setStop(true);
-	}
-	
-	private static List<Body> generateBalls(final int n) {
-		Boundary bounds = new Boundary(-1.0, -1.0, 1.0, 1.0);
+
+	private static List<Body> generateBalls(final int n, Boundary bound) {
+		final Boundary bounds = bound;
 		Random rand = new Random(System.currentTimeMillis());
 		ArrayList<Body> bodies = new ArrayList<Body>();
 		for (int i = 0; i < n; i++) {

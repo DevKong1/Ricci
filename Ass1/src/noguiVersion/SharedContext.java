@@ -1,42 +1,40 @@
-package src.noguiVersion;
+package noGUI;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
 
 public final class SharedContext {
 
-	//Shared Variable between Workers
 	private static final SharedContext SINGLETON = new SharedContext();
 	private static final double X0 = -1.0;
 	private static final double Y0 = -1.0;
 	private static final double X1 = 1.0;
 	private static final double Y1 = 1.0;
 	private static final int SEMAPHORE_PERMITS = 1;
+	private static final int THREADS = 4 ;
 	private static final Boundary BOUNDS = new Boundary(X0,Y0,X1,Y1);
 	
-	//Number of Workers
-	private static int THREADS;
-	private static int nSteps;
-	
-	private boolean stop = false;
 	//Used to divide balls correctly between threads
 	private boolean isOdd;
+	private boolean stop;
 	//Number of threads available
 	private List<Body> balls;
 	private CyclicBarrier barrier;
-	private CyclicBarrier guiSemaphore;
-	private Semaphore updateSemaphore;
+	private CyclicBarrier controlSemaphore;
+	private Semaphore updateSemaphore;	
+	private Vector<Semaphore> collisionSemaphore;
 	
 	
 	// Private constructor for Singleton
 	private SharedContext() {
-		THREADS = Runtime.getRuntime().availableProcessors() + 1;
+		stop=false;
 		barrier = new CyclicBarrier(THREADS);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
-		guiSemaphore = new CyclicBarrier(THREADS+1);
+		controlSemaphore = new CyclicBarrier(THREADS+1);
 	}
 
 	// returns Singleton instance
@@ -58,7 +56,6 @@ public final class SharedContext {
 		}
 	}
 	
-	//Method for lock Semaphore between Workers 
 	public void lockUpdateSem(){
 		try {
 			updateSemaphore.acquire();
@@ -66,16 +63,24 @@ public final class SharedContext {
 			e.printStackTrace();
 		}		
 	}
-	
-	//Method for release Semaphore between Workers 
 	public void releaseUpdateSem(){
 		updateSemaphore.release();
 	}
-	
-	//Method for wait GUI
+	//Lock 2 balls
+	public void lockBall(final int b1){
+		try {
+			collisionSemaphore.get(b1).acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}		
+	}
+	//Release 2 balls
+	public void releaseBall(final int b1){
+		collisionSemaphore.get(b1).release();
+	}
 	public void hitBarrier(){
 		try {
-			this.guiSemaphore.await();
+			this.controlSemaphore.await();
 		} catch (InterruptedException | BrokenBarrierException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -90,15 +95,22 @@ public final class SharedContext {
 	public List<Body> getBallList(){
 		return this.balls;
 	}
-	
 	// Creates the array of bodies
 	public void setBallList(final List<Body> balls) {
 		this.balls = new ArrayList<Body>(balls);
+		initCollisonVector();
 		
 		if(balls.size() % THREADS  != 0) {
 			isOdd = true;
-		}else{
-			isOdd = false;
+		}
+	}
+
+	
+	private void initCollisonVector() {
+		collisionSemaphore = new Vector<Semaphore>(balls.size());
+		
+		for(int i = 0; i < balls.size(); i++) {
+			collisionSemaphore.add(new Semaphore(SEMAPHORE_PERMITS));
 		}
 	}
 	
@@ -107,11 +119,9 @@ public final class SharedContext {
 		return BOUNDS;
 	}
 	
-	//Update global list
 	public void updateBallList(final Body b,final int index){
 		balls.set(index, b);
 	}
-	
 	//Returns how many balls should a SINGLE thread handle.
 	public int getBallsPerThread(){
 		if(isOdd){
@@ -120,30 +130,23 @@ public final class SharedContext {
 		}
 		return balls.size() / THREADS;
 	}
-	
-	//Return number of thread workers
+	public boolean getStop(){
+		return stop;
+	}
+	public void setStop(boolean val){
+		stop = val;
+	}
 	public static int getWorkers(){
 		return THREADS;
 	}
-	
-	//Return number of iterations
-	public void setSteps(int nSteps){
-		SharedContext.nSteps = nSteps;
-	}
-		
-	//Return number of iterations
-	public static int getSteps(){
-		return nSteps;
-	}
-		
-	//Set stop simulation
-	public void setStop(final boolean val){
-		stop = val;
-	}
-	
-	//Return value of stop
-	public boolean getStop(){
-		return stop;
+	/**
+	 * Testing methods
+	 * 
+	 */
+	//TESTING METHOD
+	public void printVel(final int index) {
+		Body considered = balls.get(index);
+		System.out.println(index + "Position: "+ considered.getPos().getX()+ "-" + considered.getPos().getY() +" Global Velocity: " + balls.get(index).getVel().getX() + "  ---- " + balls.get(index).getVel().getY());
 	}
 
 }

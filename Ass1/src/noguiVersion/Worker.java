@@ -1,7 +1,6 @@
-package src.noguiVersion;
+package noGUI;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -28,8 +27,7 @@ public class Worker extends Thread {
 	}
 
 	public void run() {
-		int i = 0;
-		while (i++ < context.getSteps()) {
+		while (!context.getStop()) {
 
 			//each cycle move the balls according to its speed
 			updateInternalPos();
@@ -42,6 +40,7 @@ public class Worker extends Thread {
 			//check and solve boundary collisions
 			solveBoundaryCollision();
 			context.waitNonConcurrentCalc();
+			context.hitBarrier();
 			context.hitBarrier();
 		}
 	}
@@ -75,7 +74,7 @@ public class Worker extends Thread {
 	            if (b1.collideWith(b2)) {     
 	            	synchronized(b1) {
 	            		synchronized(b2) {
-	    	            	Body.solveCollision(b1, b2);	            			
+	    	            	Body.solveCollision(b1, b2);
 	            		}
 	            	}	            	
 	            	//update local and global variables            	

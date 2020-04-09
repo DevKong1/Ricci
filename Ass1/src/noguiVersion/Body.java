@@ -1,6 +1,4 @@
-package src.noguiVersion;
-
-import java.util.*;
+package noGUI;
 
 /*
  * This class represents a body, moving in the field.
@@ -16,10 +14,6 @@ public class Body {
         this.pos = pos;
         this.vel = vel;
         this.radius = radius;
-    }
-    
-    public Body(final Body copy) {
-    	this(copy.getPos(), copy.getVel(), copy.getRadius());
     }
     
     public double getRadius() {
