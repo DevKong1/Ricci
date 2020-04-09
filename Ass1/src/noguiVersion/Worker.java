@@ -77,8 +77,6 @@ public class Worker extends Thread {
 	    	            	Body.solveCollision(b1, b2);
 	            		}
 	            	}	            	
-	            	//update local and global variables            	
-	            	threadBalls.set(i-start, b1);
 	            }
 	        }
         }
