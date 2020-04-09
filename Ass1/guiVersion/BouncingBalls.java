@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+
 public class BouncingBalls {
 
 	private int nStep;
@@ -46,13 +47,12 @@ public class BouncingBalls {
 			context.hitBarrier();
 			vt = vt + dt;
 			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
-			//context.getMatrix().reset();
+			context.hitBarrier();
 		}
 		stop();
-		long d = System.currentTimeMillis();
-		for(int i = 0;i<100;i++){
+		/*for(int i = 0;i<100;i++){
 			System.out.println("UYOOOOOOOOOOOOOOOOOOOOOOOOOO "+(d-c));
-		}
+		}*/
 
 		for(Worker b : workers){
 			try {
@@ -61,6 +61,8 @@ public class BouncingBalls {
 				e.printStackTrace();
 			}
 		}
+		long d = System.currentTimeMillis();
+		System.out.println(d-c);
 	}
 	public void stop(){
 		context.setStop(true);

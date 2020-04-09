@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class BouncingBalls {
 
-	private SharedContext context;
+	private final SharedContext context;
 	private SimulationViewer view;
 	private int j = 1;
 	private double vt = 0;
@@ -42,11 +42,19 @@ public class BouncingBalls {
 	}
 	public void stop(){
 		context.setStop(true);
+		for(final Worker w : workers){
+			try {
+				w.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	public void step(){
 			context.hitBarrier();
 			vt = vt + dt;
 			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
+			context.hitBarrier();
 	}
 	
 	private static List<Body> generateBalls(final int n) {

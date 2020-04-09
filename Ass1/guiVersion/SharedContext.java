@@ -1,6 +1,7 @@
 package guiVersion;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.BrokenBarrierException;
@@ -41,7 +42,7 @@ public final class SharedContext {
 		barrier = new CyclicBarrier(THREADS);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
 		matrix = new SharedCollisionsMatrix();
-		ticketSemaphore = new TicketSemaphore(THREADS +1);
+		ticketSemaphore = new TicketSemaphore(THREADS+1);
 		guiSemaphore = new CyclicBarrier(THREADS+1);
 	}
 
@@ -74,7 +75,6 @@ public final class SharedContext {
 	public void releaseUpdateSem(){
 		updateSemaphore.release();
 	}
-	
 	public void getTicketAndWait() {
 		ticketSemaphore.lockTicket();
 	}	

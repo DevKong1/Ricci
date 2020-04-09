@@ -19,27 +19,24 @@ public class SharedCollisionsMatrix {
 	}
 	
 	public synchronized void reset() {
-		int limit = size/WORKERS;
-		int alreadyCheked = 1;
 		int innerSize = 1;
 		matrix = new Vector<Vector<Boolean>>();
 		for (int i = 0; i < size; i++) {
 			Vector<Boolean> tmp = new Vector<>();
 			for(int k = 0 ; k < innerSize; k++){
-				if(k >= (innerSize) - alreadyCheked){
-					tmp.add(true);
-				}else{
 					tmp.add(false);
-				}
 			}
-			if(alreadyCheked >= limit){
-				alreadyCheked = 1;
-			}else{
-				alreadyCheked = alreadyCheked +1;
-			}
+			matrix.add(tmp);	
 			innerSize++;
-			matrix.add(tmp);			
 		}	   
+	}
+	public void printMatrix(){
+		for (int i = 0; i < matrix.size(); i++) {
+		    for (int j = 0; j < matrix.get(i).size(); j++) {
+		        System.out.print(matrix.get(i).get(j) + " ");
+		    }
+		    System.out.println();
+		}
 	}
 	
 	

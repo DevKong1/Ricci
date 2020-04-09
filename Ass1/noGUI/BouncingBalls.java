@@ -1,7 +1,6 @@
 package noGUI;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -16,7 +15,7 @@ public class BouncingBalls {
 		// Two indexes used to split balls between threads
 		int perThread;
 		int tmp = 0;
-		List<Body> balls = generateBalls(nBalls);
+		List<Body> balls = generateBalls(nBalls,context.getBounds());
 		// A shared context with which threads will coordinate
 		context.setBallList(balls);
 		List<Worker> workers = new ArrayList<Worker>();
@@ -31,8 +30,8 @@ public class BouncingBalls {
 		
 	}
 
-	private static List<Body> generateBalls(final int n) {
-		Boundary bounds = new Boundary(-1.0, -1.0, 1.0, 1.0);
+	private static List<Body> generateBalls(final int n,Boundary bound) {
+		final Boundary bounds = bound ;
 		Random rand = new Random(System.currentTimeMillis());
 		ArrayList<Body> bodies = new ArrayList<Body>();
 		for (int i = 0; i < n; i++) {
