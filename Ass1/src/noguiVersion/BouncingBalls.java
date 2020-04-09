@@ -39,7 +39,6 @@ public class BouncingBalls {
      */
 	public void begin(){
 		//used to measure the speedup
-		long c = System.currentTimeMillis();
 		
 		for (Worker b : workers) {
 			b.start();
@@ -52,15 +51,13 @@ public class BouncingBalls {
 		}
 		
 		//used to measure speedup
-		long d = System.currentTimeMillis();
-		System.out.println(""+(d-c));
 		stop();
 		
 		for(Worker b : workers){
 			try {
 				b.join();
 				System.out.println("joined");
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
