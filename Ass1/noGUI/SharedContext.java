@@ -15,33 +15,24 @@ public final class SharedContext {
 	private static final double X1 = 1.0;
 	private static final double Y1 = 1.0;
 	private static final int SEMAPHORE_PERMITS = 1;
-	private static final int THREADS = Runtime.getRuntime().availableProcessors() + 1 ;
+	private static final int THREADS = 4 ;
+	private static final Boundary BOUNDS = new Boundary(X0,Y0,X1,Y1);
+	
 	//Used to divide balls correctly between threads
 	private boolean isOdd;
 	//Number of threads available
 	private List<Body> balls;
-	
 	private CyclicBarrier barrier;
-	private CyclicBarrier guiSemaphore;
+	private CyclicBarrier controlSemaphore;
 	private Semaphore updateSemaphore;	
-	private TicketSemaphore ticketSemaphore;
 	private Vector<Semaphore> collisionSemaphore;
 	
-	private Boundary bounds;
-	
-	private SharedCollisionsMatrix matrix; //matrix to check if a collision has already been solved
-	
-	//TESING VARIABLE TODO DELETE
-	private Boolean printreset = true;
 	
 	// Private constructor for Singleton
 	private SharedContext() {
 		barrier = new CyclicBarrier(THREADS);
-		bounds = new Boundary(X0,Y0,X1,Y1);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
-		matrix = new SharedCollisionsMatrix();
-		ticketSemaphore = new TicketSemaphore(THREADS);
-		guiSemaphore = new CyclicBarrier(THREADS+1);
+		controlSemaphore = new CyclicBarrier(THREADS);
 	}
 
 	// returns Singleton instance
@@ -73,15 +64,6 @@ public final class SharedContext {
 	public void releaseUpdateSem(){
 		updateSemaphore.release();
 	}
-	
-	public void getTicketAndWait() {
-		ticketSemaphore.lockTicket();
-	}	
-	
-	public void releaseTicket() {
-		ticketSemaphore.releaseTicket();
-	}	
-	
 	//Lock 2 balls
 	public void lockBall(final int b1){
 		try {
@@ -96,7 +78,7 @@ public final class SharedContext {
 	}
 	public void hitBarrier(){
 		try {
-			this.guiSemaphore.await();
+			this.controlSemaphore.await();
 		} catch (InterruptedException | BrokenBarrierException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,7 +96,6 @@ public final class SharedContext {
 	// Creates the array of bodies
 	public void setBallList(final List<Body> balls) {
 		this.balls = new ArrayList<Body>(balls);
-		matrix.init(balls.size());
 		initCollisonVector();
 		
 		if(balls.size() % THREADS  != 0) {
@@ -132,13 +113,8 @@ public final class SharedContext {
 	}
 	
 	//Returns map boundaries
-	public Boundary getBounds(){
-		return this.bounds;
-	}
-	
-	//Returns collision Matrix
-	public SharedCollisionsMatrix getMatrix(){
-		return this.matrix;
+	public static Boundary getBounds(){
+		return BOUNDS;
 	}
 	
 	public void updateBallList(final Body b,final int index){
@@ -155,7 +131,6 @@ public final class SharedContext {
 	public static int getWorkers(){
 		return THREADS;
 	}
-	
 	/**
 	 * Testing methods
 	 * 
@@ -164,21 +139,6 @@ public final class SharedContext {
 	public void printVel(final int index) {
 		Body considered = balls.get(index);
 		System.out.println(index + "Position: "+ considered.getPos().getX()+ "-" + considered.getPos().getY() +" Global Velocity: " + balls.get(index).getVel().getX() + "  ---- " + balls.get(index).getVel().getY());
-	}
-	
-	public void printMatrix(){
-		if(!printreset) {
-			return;
-		}
-		
-		for(int i = 0; i < balls.size(); i++) {
-			printVel(i);
-		}		
-		printreset = false;
-	}
-	
-	public void resetPrint(){
-		printreset = true;
 	}
 
 }

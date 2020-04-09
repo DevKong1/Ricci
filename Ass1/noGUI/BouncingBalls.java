@@ -6,16 +6,16 @@ import java.util.Random;
 
 public class BouncingBalls {
 
-	public static void main(String []args) {
+	public static void main(String[] args) {
 
-		int nWorkers = 3;
+		int nWorkers = SharedContext.getWorkers();
 		int nBalls = 100;
 		int nStep = 500;
 		SharedContext context = SharedContext.getIstance();
 		// Two indexes used to split balls between threads
 		int perThread;
 		int tmp = 0;
-		List<Body> balls = generateBalls(nBalls,context.getBounds());
+		List<Body> balls = generateBalls(nBalls, SharedContext.getBounds());
 		// A shared context with which threads will coordinate
 		context.setBallList(balls);
 		List<Worker> workers = new ArrayList<Worker>();
@@ -27,11 +27,11 @@ public class BouncingBalls {
 		for (Worker w : workers) {
 			w.start();
 		}
-		
+
 	}
 
-	private static List<Body> generateBalls(final int n,Boundary bound) {
-		final Boundary bounds = bound ;
+	private static List<Body> generateBalls(final int n, Boundary bound) {
+		final Boundary bounds = bound;
 		Random rand = new Random(System.currentTimeMillis());
 		ArrayList<Body> bodies = new ArrayList<Body>();
 		for (int i = 0; i < n; i++) {
