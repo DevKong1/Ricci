@@ -38,7 +38,6 @@ public class BouncingBalls {
      * @return
      */
 	public void begin(){
-		//used to measure the speedup
 		
 		for (Worker b : workers) {
 			b.start();
@@ -49,8 +48,6 @@ public class BouncingBalls {
 			context.hitBarrier();
 			vt = vt + dt;
 		}
-		
-		//used to measure speedup
 		stop();
 		
 		for(Worker b : workers){

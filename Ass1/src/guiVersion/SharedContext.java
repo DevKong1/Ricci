@@ -32,7 +32,7 @@ public final class SharedContext {
 	
 	// Private constructor for Singleton
 	private SharedContext() {
-		THREADS = Runtime.getRuntime().availableProcessors();
+		THREADS = Runtime.getRuntime().availableProcessors() + 1;
 		barrier = new CyclicBarrier(THREADS);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
 		guiSemaphore = new CyclicBarrier(THREADS+1);
