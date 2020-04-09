@@ -42,9 +42,12 @@ public class BouncingBalls {
 	}
 	public void stop(){
 		context.setStop(true);
+		context.hitBarrier();
+		context.hitBarrier();
 		for(final Worker w : workers){
 			try {
 				w.join();
+				System.out.println("1out");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -53,7 +56,7 @@ public class BouncingBalls {
 	public void step(){
 			context.hitBarrier();
 			vt = vt + dt;
-			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
+			view.display(new ArrayList<Body>(context.getBallList()), vt, j++);
 			context.hitBarrier();
 	}
 	

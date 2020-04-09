@@ -167,7 +167,7 @@ public final class SharedContext {
 		printreset = true;
 	}
 	public void setStop(final boolean val){
-		stop = val;
+		this.stop = val;
 	}
 	public boolean getStop(){
 		return stop;

@@ -42,6 +42,13 @@ public class BouncingBalls {
 				}
 				context.hitBarrier();
 			}
+			for(Worker b : workers){
+				try {
+					b.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

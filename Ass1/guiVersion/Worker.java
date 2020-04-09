@@ -41,6 +41,7 @@ public class Worker extends Thread {
 			solveBoundaryCollision();
 			context.waitNonConcurrentCalc();
 			context.hitBarrier();
+			context.hitBarrier();
 		}
 	}
 	

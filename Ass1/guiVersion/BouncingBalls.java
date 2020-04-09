@@ -20,7 +20,6 @@ public class BouncingBalls {
 		context = SharedContext.getIstance();
 		workers = new ArrayList<Worker>();
 		// Two indexes used to split balls between threads
-		
 		int perThread;
 		int tmp = 0;
 		List<Body> balls = generateBalls(nBalls);
@@ -43,7 +42,7 @@ public class BouncingBalls {
 		for (Worker b : workers) {
 			b.start();
 		}
-		while (j++ <= nStep) {
+		while (j++ < nStep) {
 			context.hitBarrier();
 			vt = vt + dt;
 			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
@@ -53,7 +52,8 @@ public class BouncingBalls {
 		/*for(int i = 0;i<100;i++){
 			System.out.println("UYOOOOOOOOOOOOOOOOOOOOOOOOOO "+(d-c));
 		}*/
-
+		context.hitBarrier();
+		context.hitBarrier();
 		for(Worker b : workers){
 			try {
 				b.join();
@@ -66,6 +66,9 @@ public class BouncingBalls {
 	}
 	public void stop(){
 		context.setStop(true);
+	}
+	public void pauseResume(){
+		
 	}
 	
 	private static List<Body> generateBalls(final int n) {

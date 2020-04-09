@@ -55,6 +55,7 @@ public class SimulationViewer extends JFrame {
         stop.addActionListener(e -> {
         	new Thread(() ->{
             	game.stop();
+            	stop.setText("Resume");
         	}).start();
         });
         stop.setAlignmentX(Component.RIGHT_ALIGNMENT);
