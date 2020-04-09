@@ -71,7 +71,7 @@ public class BouncingBalls {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
+		}				
 	}
 	
 	/**
