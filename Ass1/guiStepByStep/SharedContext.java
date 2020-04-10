@@ -17,6 +17,7 @@ public final class SharedContext {
 	private static final int SEMAPHORE_PERMITS = 1;
 	private static final int THREADS = 4;//Runtime.getRuntime().availableProcessors() + 1 ;
 	private static final Boundary BOUNDS = new Boundary(X0,Y0,X1,Y1);
+	private static final int GUI_THREAD = 1 ;
 	
 	
 	private boolean stop = false;
@@ -24,9 +25,9 @@ public final class SharedContext {
 	private boolean isOdd;
 	//Number of threads available
 	private List<Body> balls;
-	private CyclicBarrier barrier;
-	private Semaphore updateSemaphore;
-	private CyclicBarrier guiSemaphore;
+	private final CyclicBarrier barrier;
+	private final Semaphore updateSemaphore;
+	private final CyclicBarrier guiSemaphore;
 	
 	private Vector<Semaphore> collisionSemaphore;
 	
@@ -34,7 +35,7 @@ public final class SharedContext {
 	private SharedContext() {
 		barrier = new CyclicBarrier(THREADS);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
-		guiSemaphore = new CyclicBarrier(THREADS+1);
+		guiSemaphore = new CyclicBarrier(THREADS+GUI_THREAD);
 	}
 
 	/** 
