@@ -36,6 +36,7 @@ public class BouncingBalls {
 		view = new SimulationViewer(620,620,this);
 	}
 
+	long c = System.currentTimeMillis();
 	
 	public void begin(){
 		for (Worker b : workers) {
@@ -48,6 +49,8 @@ public class BouncingBalls {
 			context.hitBarrier();
 		}
 		stop();
+		long d = System.currentTimeMillis();
+		System.out.println(""+(d-c));
 		context.hitBarrier();
 		context.hitBarrier();
 		for(Worker b : workers){

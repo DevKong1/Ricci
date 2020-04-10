@@ -15,10 +15,10 @@ public final class SharedContext {
 	private static final double X1 = 1.0;
 	private static final double Y1 = 1.0;
 	private static final int SEMAPHORE_PERMITS = 1;
-	private static final int THREADS = 4;//Runtime.getRuntime().availableProcessors() + 1 ;
 	private static final Boundary BOUNDS = new Boundary(X0,Y0,X1,Y1);
 	private static final int GUI_THREAD = 1 ;
 	
+	private static int THREADS;
 	
 	private boolean stop = false;
 	//Used to divide balls correctly between threads
@@ -34,6 +34,7 @@ public final class SharedContext {
 	
 	// Private constructor for Singleton
 	private SharedContext() {
+		THREADS = Runtime.getRuntime().availableProcessors() + 1;
 		barrier = new CyclicBarrier(THREADS);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
 		guiSemaphore = new CyclicBarrier(THREADS+GUI_THREAD);

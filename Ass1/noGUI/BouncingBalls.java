@@ -10,8 +10,8 @@ public class BouncingBalls {
 		/**
 		 * Input variables
 		 */
-		int nBalls = 100;
-		int nStep = 1;
+		int nBalls = 1000;
+		int nStep = 1000;
 
 		/**
 		 * Computational variables
@@ -34,6 +34,7 @@ public class BouncingBalls {
 			perThread = context.getBallsPerThread();
 			workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
 		}
+		long c = System.currentTimeMillis();
 		if (nStep > 0) {
 			for (Worker w : workers) {
 				w.start();
@@ -50,9 +51,11 @@ public class BouncingBalls {
 					b.join();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				}
+				} 
 			}
 		}
+		long d = System.currentTimeMillis();
+		System.out.println(""+(d-c));
 	}
 
 	private static List<Body> generateBalls(final int n, Boundary bound) {
