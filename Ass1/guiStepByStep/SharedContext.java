@@ -30,9 +30,6 @@ public final class SharedContext {
 	
 	private Vector<Semaphore> collisionSemaphore;
 	
-	//TESING VARIABLE TODO DELETE
-	private Boolean printreset = true;
-	
 	// Private constructor for Singleton
 	private SharedContext() {
 		barrier = new CyclicBarrier(THREADS);
@@ -40,13 +37,8 @@ public final class SharedContext {
 		guiSemaphore = new CyclicBarrier(THREADS+1);
 	}
 
-	// returns Singleton instance
-	public static SharedContext getIstance() {
-		return SharedContext.SINGLETON;
-	}
-
 	/** 
-	 * LOCK & UNLOCK METHODS, used access items in shared context concurrently.
+	 * Synchronization methods, used access items in shared context concurrently.
 	 */
 	// lets thread synchronize on a cyclic barrier:
 	// First time when every thread calculated new balls positions'
@@ -58,7 +50,7 @@ public final class SharedContext {
 			e.printStackTrace();
 		}
 	}
-	
+	// Used to update shared variables
 	public void lockUpdateSem(){
 		try {
 			updateSemaphore.acquire();
@@ -69,7 +61,7 @@ public final class SharedContext {
 	public void releaseUpdateSem(){
 		updateSemaphore.release();
 	}
-	//Lock 2 balls
+	//Locks a ball
 	public void lockBall(final int b1){
 		try {
 			collisionSemaphore.get(b1).acquire();
@@ -77,15 +69,17 @@ public final class SharedContext {
 			e.printStackTrace();
 		}		
 	}
-	//Release 2 balls
+	//Releases a ball
 	public void releaseBall(final int b1){
 		collisionSemaphore.get(b1).release();
 	}
+	/*
+	 * Used to let main thread and worker threads synchronize
+	 */
 	public void hitBarrier(){
 		try {
 			this.guiSemaphore.await();
 		} catch (InterruptedException | BrokenBarrierException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -98,7 +92,7 @@ public final class SharedContext {
 	public List<Body> getBallList(){
 		return this.balls;
 	}
-	// Creates the array of bodies
+	// Sets the array of shared bodies
 	public void setBallList(final List<Body> balls) {
 		this.balls = new ArrayList<Body>(balls);
 		initCollisonVector();
@@ -109,8 +103,30 @@ public final class SharedContext {
 			isOdd = false;
 		}
 	}
-
 	
+	public void updateBallList(final Body b,final int index){
+		balls.set(index, b);
+	}
+	//Returns how many balls should a SINGLE thread handle.
+	//If the number is odd, one thread gets more ball than the others
+	public int getBallsPerThread(){
+		if(isOdd){
+			isOdd = false;
+			return (balls.size() / THREADS) + (balls.size() % THREADS);
+		}
+		return balls.size() / THREADS;
+	}
+	
+	public void setStop(final boolean val){
+		stop = val;
+	}
+	public boolean getStop(){
+		return stop;
+	}
+	
+	/**
+	 * Private methods
+	 */
 	private void initCollisonVector() {
 		collisionSemaphore = new Vector<Semaphore>(balls.size());
 		
@@ -119,55 +135,20 @@ public final class SharedContext {
 		}
 	}
 	
+	/**
+	 * Static methods
+	 */
+	// returns Singleton instance
+	public static SharedContext getIstance() {
+		return SharedContext.SINGLETON;
+	}
 	//Returns map boundaries
 	public static Boundary getBounds(){
 		return BOUNDS;
 	}
-	
-	public void updateBallList(final Body b,final int index){
-		balls.set(index, b);
-	}
-	//Returns how many balls should a SINGLE thread handle.
-	public int getBallsPerThread(){
-		if(isOdd){
-			isOdd = false;
-			return (balls.size() / THREADS) + (balls.size() % THREADS);
-		}
-		return balls.size() / THREADS;
-	}
+	//Return numbers of thread
 	public static int getWorkers(){
 		return THREADS;
 	}
-	
-	/**
-	 * Testing methods
-	 * 
-	 */
-	//TESTING METHOD
-	public void printVel(final int index) {
-		Body considered = balls.get(index);
-		System.out.println(index + "Position: "+ considered.getPos().getX()+ "-" + considered.getPos().getY() +" Global Velocity: " + balls.get(index).getVel().getX() + "  ---- " + balls.get(index).getVel().getY());
-	}
-	
-	public void printMatrix(){
-		if(!printreset) {
-			return;
-		}
-		
-		for(int i = 0; i < balls.size(); i++) {
-			printVel(i);
-		}		
-		printreset = false;
-	}
-	
-	public void resetPrint(){
-		printreset = true;
-	}
-	public void setStop(final boolean val){
-		stop = val;
-	}
-	public boolean getStop(){
-		return stop;
-	}
-
 }
+

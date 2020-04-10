@@ -28,24 +28,30 @@ public class Worker extends Thread {
 
 	public void run() {
 		while (!context.getStop()) {
-
-			//each cycle move the balls according to its speed
 			updateInternalPos();
 			context.waitNonConcurrentCalc();			
-			
-			//check and solve collisions assigned to the thread
 			checkAndSolveCollisions();
 			context.waitNonConcurrentCalc();
-
-			//check and solve boundary collisions
 			solveBoundaryCollision();
 			context.waitNonConcurrentCalc();
+			/*
+			 * Double cyclic barrier, used to let threads synchronize with each other
+			 * the first hit let's thread know a round of computation has just terminated
+			 * Second one lets threads wait for GUI to print every ball before going on with
+			 * the next round of computation.
+			 */
 			context.hitBarrier();
 			context.hitBarrier();
 		}
 	}
 	
-	//method to move each assigned ball accordingly to its velocity
+	/**
+	 * Private worker's methods
+	 */
+	/*
+	 * method to move each assigned ball accordingly to its velocity, after
+	 * doing so it reflects changes to the global list
+	 */
 	private void updateInternalPos() {
 		
 		for(int i = 0; i < threadBalls.size(); i++) {
@@ -57,7 +63,10 @@ public class Worker extends Thread {
 		context.releaseUpdateSem();
 	}
 	
-	//method to check and solve collisions relative to balls assigned to the thread
+	/*
+	 * Checks and solves collisions between the balls assigned to this thread
+	 * and every other ball
+	 */
 	private void checkAndSolveCollisions() {
 		
 		//instantiate a copy of the global ball list

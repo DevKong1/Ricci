@@ -31,14 +31,13 @@ public class BouncingBalls {
 			workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
 		}
 	}
-	
+	//When this class is initiated by this method, it launches the GUI.
 	public void init(){
 		view = new SimulationViewer(620,620,this);
 	}
 
 	
 	public void begin(){
-		long c = System.currentTimeMillis();
 		for (Worker b : workers) {
 			b.start();
 		}
@@ -49,9 +48,6 @@ public class BouncingBalls {
 			context.hitBarrier();
 		}
 		stop();
-		/*for(int i = 0;i<100;i++){
-			System.out.println("UYOOOOOOOOOOOOOOOOOOOOOOOOOO "+(d-c));
-		}*/
 		context.hitBarrier();
 		context.hitBarrier();
 		for(Worker b : workers){
@@ -61,17 +57,13 @@ public class BouncingBalls {
 				e.printStackTrace();
 			}
 		}
-		long d = System.currentTimeMillis();
-		System.out.println(d-c);
 	}
+	//Method called by the GUI to stop the computation
 	public void stop(){
 		context.setStop(true);
 	}
-	public void pauseResume(){
-		
-	}
 	
-	private static List<Body> generateBalls(final int n) {
+	private List<Body> generateBalls(final int n) {
 		Boundary bounds = new Boundary(-1.0, -1.0, 1.0, 1.0);
 		Random rand = new Random(System.currentTimeMillis());
 		ArrayList<Body> bodies = new ArrayList<Body>();

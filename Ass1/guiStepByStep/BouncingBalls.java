@@ -13,7 +13,7 @@ public class BouncingBalls {
 	private double dt = 0.1;
 	private List<Worker> workers;
 
-	public BouncingBalls(final int nBalls, final int nStep) {
+	public BouncingBalls(final int nBalls) {
 		context = SharedContext.getIstance();
 		workers = new ArrayList<Worker>();
 		// Two indexes used to split balls between threads
@@ -30,6 +30,7 @@ public class BouncingBalls {
 		}
 	}
 	
+	//When this class is initiated by this method, it launches the GUI.
 	public void init(){
 		view = new SimulationViewer(620,620,this);
 	}
