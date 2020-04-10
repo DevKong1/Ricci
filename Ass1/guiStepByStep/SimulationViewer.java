@@ -64,8 +64,8 @@ public class SimulationViewer extends JFrame {
 		stop = new JButton("Stop");
 		stop.setSize(step.getSize());
 		label1 = new JLabel("Bodies: " + " - vt: " + " - nIter: ");
-		label1.setAlignmentX(Component.LEFT_ALIGNMENT);
-		label1.setSize(componentPane.getSize());
+		label1.setAlignmentX(Component.TOP_ALIGNMENT);
+		label1.setMaximumSize(new Dimension(200, 10));
 		step.addActionListener(e -> {
 			new Thread(() -> {
 				if (!begin) {
