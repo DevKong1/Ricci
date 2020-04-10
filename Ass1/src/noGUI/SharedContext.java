@@ -1,4 +1,4 @@
-package noGUI;
+package src.noGUI;
 
 import java.util.ArrayList;
 import java.util.List;

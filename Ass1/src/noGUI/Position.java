@@ -1,4 +1,4 @@
-package noGUI;
+package src.noGUI;
 
 public class Position { 
 

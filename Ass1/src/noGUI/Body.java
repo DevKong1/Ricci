@@ -1,4 +1,4 @@
-package noGUI;
+package src.noGUI;
 
 /*
  * This class represents a body, moving in the field.
