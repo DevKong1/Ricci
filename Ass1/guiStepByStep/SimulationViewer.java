@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.*;
 
@@ -25,10 +26,15 @@ public class SimulationViewer extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private VisualiserPanel panel;
-	private Container p;
+	private Container mainContainer;
+	private JPanel componentPane;
+	private JPanel buttonPane;
 	private BouncingBalls game;
-	private boolean begin = false;
-
+	private boolean begin;
+	JButton step;
+	JButton stop = new JButton("Stop");
+	JLabel label1 = new JLabel();
+	 private static DecimalFormat df2;
 	/**
 	 * Creates a view of the specified size (in pixels)
 	 * 
@@ -36,24 +42,36 @@ public class SimulationViewer extends JFrame {
 	 * @param h
 	 */
 	public SimulationViewer(int w, int h, BouncingBalls controller) {
+		begin=false;
 		this.game = controller;
 		setTitle("Bodies Simulation");
 		setSize(w, h);
 		setResizable(false);
+		df2 = new DecimalFormat("#.##");
 		JFrame myFrame = new JFrame();
 		myFrame.setSize(new Dimension(w, h + 75));
 		myFrame.setLayout(new BorderLayout());
+
 		panel = new VisualiserPanel(w, h);
-		p = getContentPane();
-		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-		JButton step = new JButton("Start");
-		  JButton stop = new JButton("Stop");
+		mainContainer = getContentPane();
+		componentPane = new JPanel();
+		buttonPane = new JPanel();
+		mainContainer.setLayout(new BoxLayout(mainContainer, BoxLayout.Y_AXIS));
+		componentPane.setLayout(new BoxLayout(componentPane, BoxLayout.X_AXIS));
+		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.Y_AXIS));
+		buttonPane.setSize(componentPane.getSize());
+		step = new JButton("Start");
+		stop = new JButton("Stop");
+		stop.setSize(step.getSize());
+		label1 = new JLabel("Bodies: " + " - vt: " + " - nIter: ");
+		label1.setAlignmentX(Component.LEFT_ALIGNMENT);
+		label1.setSize(componentPane.getSize());
 		step.addActionListener(e -> {
 			new Thread(() -> {
 				if (!begin) {
-					game.begin();
-					begin = true;
 					step.setText("Step");
+					begin = true;
+					game.begin();
 				}else{
 					game.step();
 				}
@@ -64,13 +82,14 @@ public class SimulationViewer extends JFrame {
             	game.stop();
         	}).start();
         });
-        stop.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        step.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        p.add(Box.createRigidArea(new Dimension(0,10)));
-        p.add(step);
-        p.add(stop);
-        p.add(Box.createRigidArea(new Dimension(0,10)));
-        p.add(panel);
+		buttonPane.add(step);
+		buttonPane.add(stop);
+		componentPane.add(label1);
+		componentPane.add(Box.createRigidArea(new Dimension(200, 0)));
+		componentPane.add(buttonPane);
+		mainContainer.add(componentPane);
+		mainContainer.add(Box.createRigidArea(new Dimension(0, 10)));
+		mainContainer.add(panel);
 		myFrame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent ev) {
 				System.exit(-1);
@@ -80,12 +99,13 @@ public class SimulationViewer extends JFrame {
 				System.exit(-1);
 			}
 		});
-		myFrame.getContentPane().add(p);
+		myFrame.getContentPane().add(mainContainer);
 		myFrame.setVisible(true);
 	}
 
 	public void display(ArrayList<Body> bodies, double vt, long iter) {
-		panel.display(bodies, vt, iter);
+		panel.display(bodies);
+		label1.setText("Bodies: " + bodies.size() + " - vt: " + df2.format(vt) + " - nIter: " + iter);
 	}
 
 	public static class VisualiserPanel extends JPanel {
@@ -95,9 +115,6 @@ public class SimulationViewer extends JFrame {
 		 */
 		private static final long serialVersionUID = 1L;
 		private ArrayList<Body> bodies = new ArrayList<Body>();
-		private long nIter;
-		private double vt;
-
 		private long dx;
 		private long dy;
 
@@ -121,14 +138,10 @@ public class SimulationViewer extends JFrame {
 				int y0 = (int) (dy - p.getY() * dy);
 				g2.drawOval(x0, y0, (int) (rad * dx * 2), (int) (rad * dy * 2));
 			});
-			String time = String.format("%.2f", vt);
-			g2.drawString("Bodies: " + bodies.size() + " - vt: " + time + " - nIter: " + nIter, 2, 20);
 		}
 
-		public void display(ArrayList<Body> bodies, double vt, long iter) {
+		public void display(ArrayList<Body> bodies) {
 			this.bodies = bodies;
-			this.vt = vt;
-			this.nIter = iter;
 			repaint();
 		}
 	}

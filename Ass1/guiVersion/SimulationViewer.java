@@ -9,119 +9,132 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.*;
 
-
 /**
  * Simulation view
+ * 
  * @author aricci
  *
  */
 public class SimulationViewer extends JFrame {
-    
-    /**
+
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private VisualiserPanel panel;
-    private Container p;
-    private BouncingBalls game;
-    /**
-     * Creates a view of the specified size (in pixels)
-     * @param w
-     * @param h
-     */
-    public SimulationViewer(int w, int h, BouncingBalls controller){
-    	this.game = controller;
-    	setTitle("Bodies Simulation");
-        setSize(w,h);
-        setResizable(false);
-        JFrame myFrame = new JFrame();
-        myFrame.setSize(new Dimension(w,h+75));
-        myFrame.setLayout(new BorderLayout());
-        panel = new VisualiserPanel(w,h);
-        p = getContentPane();
-        p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-        JButton start = new JButton("Start");
-        JButton stop = new JButton("Stop");
-        start.addActionListener(e -> {
-        	new Thread(() ->{
-            	game.begin();
-            	this.setVisible(false);;
-        	}).start();
-        });
-        start.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        stop.addActionListener(e -> {
-        	new Thread(() ->{
-            	game.stop();
-            	stop.setText("Resume");
-        	}).start();
-        });
-        stop.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        p.add(Box.createRigidArea(new Dimension(0,10)));
-        p.add(start);
-        p.add(stop);
-        p.add(Box.createRigidArea(new Dimension(0,10)));
-        p.add(panel);
-        myFrame.addWindowListener(new WindowAdapter(){
-			public void windowClosing(WindowEvent ev){
+	private Container mainContainer;
+	private JPanel componentPane;
+	private JPanel buttonPane;
+	private BouncingBalls game;
+	JButton start;
+	JButton stop = new JButton("Stop");
+	JLabel label1 = new JLabel();
+	 private static DecimalFormat df2;
+	/**
+	 * Creates a view of the specified size (in pixels)
+	 * 
+	 * @param w
+	 * @param h
+	 */
+	public SimulationViewer(int w, int h, BouncingBalls controller) {
+		this.game = controller;
+		setTitle("Bodies Simulation");
+		setSize(w, h);
+		setResizable(false);
+		df2 = new DecimalFormat("#.##");
+		JFrame myFrame = new JFrame();
+		myFrame.setSize(new Dimension(w, h + 75));
+		myFrame.setLayout(new BorderLayout());
+
+		panel = new VisualiserPanel(w, h);
+		mainContainer = getContentPane();
+		componentPane = new JPanel();
+		buttonPane = new JPanel();
+		mainContainer.setLayout(new BoxLayout(mainContainer, BoxLayout.Y_AXIS));
+		componentPane.setLayout(new BoxLayout(componentPane, BoxLayout.X_AXIS));
+		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.Y_AXIS));
+		buttonPane.setSize(componentPane.getSize());
+		start = new JButton("Start");
+		stop = new JButton("Stop");
+		label1 = new JLabel("Bodies: " + " - vt: " + " - nIter: ");
+		label1.setAlignmentX(Component.LEFT_ALIGNMENT);
+		start.addActionListener(e -> {
+			new Thread(() -> {
+				start.setVisible(false);
+				game.begin();
+			}).start();
+		});
+		stop.addActionListener(e -> {
+			new Thread(() -> {
+				game.stop();
+				stop.setText("Resume");
+			}).start();
+		});
+		buttonPane.add(start);
+		buttonPane.add(stop);
+		componentPane.add(label1);
+		componentPane.add(Box.createRigidArea(new Dimension(200, 0)));
+		componentPane.add(buttonPane);
+		mainContainer.add(componentPane);
+		mainContainer.add(Box.createRigidArea(new Dimension(0, 10)));
+		mainContainer.add(panel);
+		myFrame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent ev) {
 				System.exit(-1);
 			}
-			public void windowClosed(WindowEvent ev){
+
+			public void windowClosed(WindowEvent ev) {
 				System.exit(-1);
 			}
 		});
-        myFrame.getContentPane().add(p);
-        myFrame.setVisible(true);
-    }
-	public void display(ArrayList<Body> bodies, double vt, long iter) {
-				panel.display(bodies, vt, iter);
+		myFrame.getContentPane().add(mainContainer);
+		myFrame.setVisible(true);
 	}
-    public static class VisualiserPanel extends JPanel {
-        
-    	/**
+
+	public void display(ArrayList<Body> bodies, double vt, long iter) {
+		panel.display(bodies, vt);
+		label1.setText("Bodies: " + bodies.size() + " - vt: " + df2.format(vt) + " - nIter: " + iter);
+	}
+
+	public static class VisualiserPanel extends JPanel {
+
+		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
 		private ArrayList<Body> bodies = new ArrayList<Body>();
-    	private long nIter;
-    	private double vt;
-    	
-        private long dx;
-        private long dy;
-        
-        public VisualiserPanel(int w, int h){
-            setSize(w,h);
-            dx = w/2 - 20;
-            dy = h/2 - 20;
-        }
+		private long dx;
+		private long dy;
 
-        public void paint(Graphics g){
-    		Graphics2D g2 = (Graphics2D) g;
-    		
-    		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-    		          RenderingHints.VALUE_ANTIALIAS_ON);
-    		g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-    		          RenderingHints.VALUE_RENDER_QUALITY);
-    		g2.clearRect(0,0,this.getWidth(),this.getHeight());
-	        
-    		bodies.forEach( b -> {
-	        	Position p = b.getPos();
-	            double rad = b.getRadius();
-	            int x0 = (int)(dx + p.getX()*dx);
-		        int y0 = (int)(dy - p.getY()*dy);
-		        g2.drawOval(x0,y0, (int)(rad*dx*2), (int)(rad*dy*2));
-		    });		    
-    		String time = String.format("%.2f", vt);
-    		g2.drawString("Bodies: " + bodies.size() + " - vt: " + time + " - nIter: " + nIter, 2, 20);
-        }
-        
-        public void display(ArrayList<Body> bodies, double vt, long iter){
-            this.bodies = bodies;
-            this.vt = vt;
-            this.nIter = iter;
-        	repaint();
-        }
-    }
+		public VisualiserPanel(int w, int h) {
+			setSize(w, h);
+			dx = w / 2 - 20;
+			dy = h / 2 - 20;
+		}
+
+		public void paint(Graphics g) {
+			Graphics2D g2 = (Graphics2D) g;
+
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			g2.clearRect(0, 0, this.getWidth(), this.getHeight());
+
+			bodies.forEach(b -> {
+				Position p = b.getPos();
+				double rad = b.getRadius();
+				int x0 = (int) (dx + p.getX() * dx);
+				int y0 = (int) (dy - p.getY() * dy);
+				g2.drawOval(x0, y0, (int) (rad * dx * 2), (int) (rad * dy * 2));
+			});
+		}
+
+		public void display(ArrayList<Body> bodies, double vt) {
+			this.bodies = bodies;
+			repaint();
+		}
+	}
 }
