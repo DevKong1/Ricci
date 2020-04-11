@@ -118,7 +118,7 @@
 </graphics>
 </name>
 <orientation>
-<value>0</value>
+<value>90</value>
 </orientation>
 <rate>
 <value>1.0</value>
@@ -155,7 +155,7 @@
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="449" y="230" curvePoint="false"/>
+<arcpath id="000" x="449" y="229" curvePoint="false"/>
 <arcpath id="001" x="377" y="277" curvePoint="false"/>
 <type value="normal"/>
 </arc>
@@ -194,9 +194,11 @@
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="386" y="336" curvePoint="false"/>
-<arcpath id="001" x="657" y="237" curvePoint="false"/>
-<arcpath id="002" x="377" y="67" curvePoint="false"/>
+<arcpath id="000" x="386" y="342" curvePoint="false"/>
+<arcpath id="001" x="538" y="343" curvePoint="false"/>
+<arcpath id="002" x="526" y="20" curvePoint="false"/>
+<arcpath id="003" x="379" y="20" curvePoint="false"/>
+<arcpath id="004" x="371" y="66" curvePoint="false"/>
 <type value="normal"/>
 </arc>
 <arc id="wait to t(nCore+1)" source="wait" target="t(nCore+1)">
@@ -208,7 +210,7 @@
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="376" y="77" curvePoint="false"/>
+<arcpath id="000" x="379" y="77" curvePoint="false"/>
 <arcpath id="001" x="454" y="209" curvePoint="false"/>
 <type value="normal"/>
 </arc>
@@ -221,7 +223,7 @@
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="366" y="72" curvePoint="false"/>
+<arcpath id="000" x="365" y="76" curvePoint="false"/>
 <arcpath id="001" x="289" y="208" curvePoint="false"/>
 <type value="normal"/>
 </arc>
@@ -234,7 +236,7 @@
 <tagged>
 <value>false</value>
 </tagged>
-<arcpath id="000" x="372" y="87" curvePoint="false"/>
+<arcpath id="000" x="372" y="77" curvePoint="false"/>
 <arcpath id="001" x="372" y="207" curvePoint="false"/>
 <type value="normal"/>
 </arc>
