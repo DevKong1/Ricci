@@ -48,7 +48,6 @@ public class BouncingBalls {
 		for(final Worker w : workers){
 			try {
 				w.join();
-				System.out.println("1out");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

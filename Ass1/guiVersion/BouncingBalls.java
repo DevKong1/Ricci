@@ -47,9 +47,6 @@ public class BouncingBalls {
 			while(context.getStop()) {
 				try {
 					this.wait();
-					for(Worker c : workers) {
-						c.wait();
-					}
 				} catch(Exception ex) {}
 			}
 			vt = vt + dt;

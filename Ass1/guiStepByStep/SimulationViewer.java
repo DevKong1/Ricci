@@ -80,6 +80,7 @@ public class SimulationViewer extends JFrame {
 		stop.addActionListener(e -> {
         	new Thread(() ->{
             	game.stop();
+            	step.setVisible(false);
         	}).start();
         });
 		buttonPane.add(step);
