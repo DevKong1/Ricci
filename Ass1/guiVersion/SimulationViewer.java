@@ -33,7 +33,10 @@ public class SimulationViewer extends JFrame {
 	JButton start;
 	JButton stop = new JButton("Stop");
 	JLabel label1 = new JLabel();
-	 private static DecimalFormat df2;
+	private static DecimalFormat df2;
+	private boolean running;
+	private boolean started = false;
+	
 	/**
 	 * Creates a view of the specified size (in pixels)
 	 * 
@@ -59,20 +62,31 @@ public class SimulationViewer extends JFrame {
 		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.Y_AXIS));
 		buttonPane.setSize(componentPane.getSize());
 		start = new JButton("Start");
-		stop = new JButton("Stop");
+		stop = new JButton("Pause");
 		label1 = new JLabel("Bodies: " + " - vt: " + " - nIter: ");
 		label1.setAlignmentX(Component.TOP_ALIGNMENT);
 		label1.setMaximumSize(new Dimension(200, 10));
 		start.addActionListener(e -> {
 			new Thread(() -> {
-				start.setVisible(false);
-				game.begin();
+				if(!game.isEnded()) {
+					if(!started) {
+						started = true;
+						running = true;
+						game.begin();
+					}
+					if(!running && started) {
+						running = true;
+				        game.resume();
+					}
+				}
 			}).start();
 		});
 		stop.addActionListener(e -> {
 			new Thread(() -> {
-				game.stop();
-				stop.setText("Resume");
+				if (!game.isEnded() && running) {
+			        running = false;
+			        game.stop();
+			    }
 			}).start();
 		});
 		buttonPane.add(start);

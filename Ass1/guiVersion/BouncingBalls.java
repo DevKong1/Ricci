@@ -14,9 +14,11 @@ public class BouncingBalls {
 	private double vt = 0;
 	private double dt = 0.1;
 	private List<Worker> workers;
+	private boolean end;
 
 	public BouncingBalls(final int nBalls, final int nStep) {
 		this.nStep = nStep;
+		end = false;
 		context = SharedContext.getIstance();
 		workers = new ArrayList<Worker>();
 		// Two indexes used to split balls between threads
@@ -44,11 +46,17 @@ public class BouncingBalls {
 		}
 		while (j++ < nStep) {
 			context.hitBarrier();
+			while(context.getStop()) {
+				try {
+					this.wait();
+				} catch(Exception ex) {}
+			}
 			vt = vt + dt;
-			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
+			view.display(new ArrayList<Body>(context.getBallList()), vt, j);
 			context.hitBarrier();
 		}
-		stop();
+		this.end = true;
+		end();
 		long d = System.currentTimeMillis();
 		System.out.println(""+(d-c));
 		context.hitBarrier();
@@ -64,6 +72,18 @@ public class BouncingBalls {
 	//Method called by the GUI to stop the computation
 	public void stop(){
 		context.setStop(true);
+	}
+	
+	public void resume() {
+		context.setStop(false);
+	}
+	
+	public void end() {
+		context.setEnd(true);
+	}
+	
+	public boolean isEnded() {
+		return this.end;
 	}
 	
 	private List<Body> generateBalls(final int n) {

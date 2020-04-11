@@ -27,7 +27,7 @@ public class Worker extends Thread {
 	}
 
 	public void run() {
-		while (!context.getStop()) {
+		while (!context.isEnded()) {
 			updateInternalPos();
 			context.waitNonConcurrentCalc();			
 			checkAndSolveCollisions();
