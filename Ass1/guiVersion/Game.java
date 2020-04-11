@@ -7,8 +7,6 @@ public class Game {
 		int steps = 1000;
 		int balls = 1000;
 		new BouncingBalls(balls,steps).init();
-				
-
 	}
 
 }

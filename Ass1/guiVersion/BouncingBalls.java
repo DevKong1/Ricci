@@ -44,11 +44,19 @@ public class BouncingBalls {
 		}
 		while (j++ < nStep) {
 			context.hitBarrier();
+			while(context.getStop()) {
+				try {
+					this.wait();
+					for(Worker c : workers) {
+						c.wait();
+					}
+				} catch(Exception ex) {}
+			}
 			vt = vt + dt;
-			view.display(new ArrayList<Body>(context.getBallList()), vt, j-1);
+			view.display(new ArrayList<Body>(context.getBallList()), vt, j);
 			context.hitBarrier();
 		}
-		stop();
+		end();
 		long d = System.currentTimeMillis();
 		System.out.println(""+(d-c));
 		context.hitBarrier();
@@ -64,6 +72,14 @@ public class BouncingBalls {
 	//Method called by the GUI to stop the computation
 	public void stop(){
 		context.setStop(true);
+	}
+	
+	public void resume() {
+		context.setStop(false);
+	}
+	
+	public void end() {
+		context.setEnd(true);
 	}
 	
 	private List<Body> generateBalls(final int n) {
