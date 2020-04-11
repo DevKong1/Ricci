@@ -20,6 +20,8 @@ public final class SharedContext {
 
 	private static int THREADS;
 	
+	private boolean isEnded = false;
+	
 	private boolean stop = false;
 	//Used to divide balls correctly between threads
 	private boolean isOdd;
@@ -151,6 +153,14 @@ public final class SharedContext {
 	//Return numbers of thread
 	public static int getWorkers(){
 		return THREADS;
+	}
+	
+	public boolean isEnded() {
+		return isEnded;
+	}
+	
+	public void setEnd(boolean b) {
+		isEnded = b;
 	}
 }
 

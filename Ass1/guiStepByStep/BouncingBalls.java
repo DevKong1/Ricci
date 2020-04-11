@@ -6,14 +6,18 @@ import java.util.Random;
 
 public class BouncingBalls {
 
+	private int nSteps;
 	private final SharedContext context;
 	private SimulationViewer view;
 	private int j = 1;
 	private double vt = 0;
 	private double dt = 0.1;
 	private List<Worker> workers;
+	private boolean end;
 
-	public BouncingBalls(final int nBalls) {
+	public BouncingBalls(final int nBalls, final int nSteps) {
+		this.nSteps = nSteps;
+		end = false;
 		context = SharedContext.getIstance();
 		workers = new ArrayList<Worker>();
 		// Two indexes used to split balls between threads
@@ -41,8 +45,8 @@ public class BouncingBalls {
 			b.start();
 		}
 	}
-	public void stop(){
-		context.setStop(true);
+	public void end(){
+		context.setEnd(true);
 		context.hitBarrier();
 		context.hitBarrier();
 		for(final Worker w : workers){
@@ -54,10 +58,31 @@ public class BouncingBalls {
 		}
 	}
 	public void step(){
-			context.hitBarrier();
-			vt = vt + dt;
-			view.display(new ArrayList<Body>(context.getBallList()), vt, j++);
-			context.hitBarrier();
+		context.hitBarrier();
+		while(context.getStop()) {
+			try {
+				this.wait();
+			} catch(Exception ex) {}
+		}
+		vt = vt + dt;
+		view.display(new ArrayList<Body>(context.getBallList()), vt, j++);
+		context.hitBarrier();
+		if(j == nSteps) {
+			this.end = true;
+			end();
+		}
+	}
+	
+	public void resume() {
+		context.setStop(false);
+	}
+	
+	public void stop() {
+		context.setStop(true);
+	}
+	
+	public boolean isEnded() {
+		return this.end;
 	}
 	
 	private static List<Body> generateBalls(final int n) {

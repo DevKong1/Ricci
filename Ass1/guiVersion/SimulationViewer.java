@@ -68,20 +68,22 @@ public class SimulationViewer extends JFrame {
 		label1.setMaximumSize(new Dimension(200, 10));
 		start.addActionListener(e -> {
 			new Thread(() -> {
-				if(!started) {
-					started = true;
-					running = true;
-					game.begin();
-				}
-				if(!running && started) {
-					running = true;
-			        game.resume();
+				if(!game.isEnded()) {
+					if(!started) {
+						started = true;
+						running = true;
+						game.begin();
+					}
+					if(!running && started) {
+						running = true;
+				        game.resume();
+					}
 				}
 			}).start();
 		});
 		stop.addActionListener(e -> {
 			new Thread(() -> {
-				if (running) {
+				if (!game.isEnded() && running) {
 			        running = false;
 			        game.stop();
 			    }
