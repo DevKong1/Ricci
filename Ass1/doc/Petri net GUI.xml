@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><pnml>
+<net id="Net-One" type="P/T net">
+<token id="Default" enabled="true" red="0" green="0" blue="0"/>
+<place id="t(N Core)">
+<graphics>
+<position x="450.0" y="210.0"/>
+</graphics>
+<name>
+<value>t(N Core)</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,1</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>1</value>
+</capacity>
+</place>
+<place id="t1">
+<graphics>
+<position x="270.0" y="210.0"/>
+</graphics>
+<name>
+<value>t1</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,1</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>1</value>
+</capacity>
+</place>
+<place id="t2">
+<graphics>
+<position x="360.0" y="210.0"/>
+</graphics>
+<name>
+<value>t2</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,1</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>1</value>
+</capacity>
+</place>
+<place id="update">
+<graphics>
+<position x="450.0" y="435.0"/>
+</graphics>
+<name>
+<value>update</value>
+<graphics>
+<offset x="-1.0" y="23.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="updateGUI">
+<graphics>
+<position x="360.0" y="345.0"/>
+</graphics>
+<name>
+<value>updateGUI</value>
+<graphics>
+<offset x="1.0" y="-2.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<transition id="barrier">
+<graphics>
+<position x="360.0" y="270.0"/>
+</graphics>
+<name>
+<value>barrier</value>
+<graphics>
+<offset x="75.0" y="17.0"/>
+</graphics>
+</name>
+<orientation>
+<value>90</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>false</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="GUIbarrier">
+<graphics>
+<position x="360.0" y="435.0"/>
+</graphics>
+<name>
+<value>GUIbarrier</value>
+<graphics>
+<offset x="-5.0" y="35.0"/>
+</graphics>
+</name>
+<orientation>
+<value>90</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>false</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="wait">
+<graphics>
+<position x="360.0" y="60.0"/>
+</graphics>
+<name>
+<value>wait</value>
+<graphics>
+<offset x="-5.0" y="35.0"/>
+</graphics>
+</name>
+<orientation>
+<value>90</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>false</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<arc id="barrier to updateGUI" source="barrier" target="updateGUI">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="371" y="286" curvePoint="false"/>
+<arcpath id="001" x="371" y="342" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="GUIbarrier to update" source="GUIbarrier" target="update">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="386" y="447" curvePoint="false"/>
+<arcpath id="001" x="447" y="447" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="t(nCore+1) to barrier" source="t(N Core)" target="barrier">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="449" y="230" curvePoint="false"/>
+<arcpath id="001" x="377" y="277" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="t1 to barrier" source="t1" target="barrier">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="294" y="230" curvePoint="false"/>
+<arcpath id="001" x="363" y="276" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="t2 to barrier" source="t2" target="barrier">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="371" y="236" curvePoint="false"/>
+<arcpath id="001" x="370" y="276" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="updateGUI to GUIbarrier" source="updateGUI" target="GUIbarrier">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="371" y="371" curvePoint="false"/>
+<arcpath id="001" x="371" y="441" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="update to wait" source="update" target="wait">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="469" y="434" curvePoint="false"/>
+<arcpath id="001" x="524" y="344" curvePoint="false"/>
+<arcpath id="002" x="527" y="21" curvePoint="false"/>
+<arcpath id="003" x="380" y="21" curvePoint="false"/>
+<arcpath id="004" x="371" y="66" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="wait to t(nCore+1)" source="wait" target="t(N Core)">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="379" y="77" curvePoint="false"/>
+<arcpath id="001" x="454" y="208" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="wait to t1" source="wait" target="t1">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="365" y="76" curvePoint="false"/>
+<arcpath id="001" x="289" y="209" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="wait to t2" source="wait" target="t2">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="372" y="77" curvePoint="false"/>
+<arcpath id="001" x="372" y="207" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+</net>
+</pnml>
