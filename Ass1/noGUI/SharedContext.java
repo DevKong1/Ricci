@@ -2,7 +2,6 @@ package noGUI;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
@@ -27,13 +26,17 @@ public final class SharedContext {
 	private List<Body> balls;
 	private final CyclicBarrier barrier;
 	private final CyclicBarrier controlSemaphore;
-	private final Semaphore updateSemaphore;	
-	private Vector<Semaphore> collisionSemaphore;
+	private final Semaphore updateSemaphore;
 	
 	
 	// Private constructor for Singleton
 	private SharedContext() {
-		THREADS = Runtime.getRuntime().availableProcessors() + 1;
+		// To avoid program to be sequential
+		if(Runtime.getRuntime().availableProcessors() < 3) {
+			THREADS= 3;
+		} else {
+			THREADS = Runtime.getRuntime().availableProcessors();
+		}
 		stop=false;
 		barrier = new CyclicBarrier(THREADS);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
@@ -64,19 +67,6 @@ public final class SharedContext {
 	public void releaseUpdateSem(){
 		updateSemaphore.release();
 	}
-	
-	//Locks a balls
-	public void lockBall(final int b1){
-		try {
-			collisionSemaphore.get(b1).acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}		
-	}
-	//Releases a balls
-	public void releaseBall(final int b1){
-		collisionSemaphore.get(b1).release();
-	}
 	/*
 	 * Used to let main thread and worker threads synchronize
 	 */
@@ -100,7 +90,6 @@ public final class SharedContext {
 	// Sets the array of shared bodies
 	public void setBallList(final List<Body> balls) {
 		this.balls = new ArrayList<Body>(balls);
-		initCollisonVector();
 		
 		if(balls.size() % THREADS  != 0) {
 			isOdd = true;
@@ -113,6 +102,9 @@ public final class SharedContext {
 	//Returns how many balls should a SINGLE thread handle.
 	//If the number is odd, one thread gets more ball than the others
 	public int getBallsPerThread(){
+		if(balls.size() < THREADS) {
+			return 1;
+		}
 		if(isOdd){
 			isOdd = false;
 			return (balls.size() / THREADS) + (balls.size() % THREADS);
@@ -126,16 +118,6 @@ public final class SharedContext {
 	//Used to let workers know when calculation is over and they should terminate
 	public void setStop(boolean val){
 		stop = val;
-	}
-	/**
-	 * private methods
-	 */
-	private void initCollisonVector() {
-		collisionSemaphore = new Vector<Semaphore>(balls.size());
-		
-		for(int i = 0; i < balls.size(); i++) {
-			collisionSemaphore.add(new Semaphore(SEMAPHORE_PERMITS));
-		}
 	}
 	/**
 	 * Static methods

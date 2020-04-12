@@ -2,7 +2,6 @@ package guiVersion;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Semaphore;
@@ -31,12 +30,14 @@ public final class SharedContext {
 	private final Semaphore updateSemaphore;
 	private final CyclicBarrier guiSemaphore;
 	
-	
-	private Vector<Semaphore> collisionSemaphore;
-	
 	// Private constructor for Singleton
 	private SharedContext() {
-		THREADS = Runtime.getRuntime().availableProcessors() + 1;
+		// To avoid program to be sequential
+		if(Runtime.getRuntime().availableProcessors() < 3) {
+			THREADS= 3;
+		} else {
+			THREADS = Runtime.getRuntime().availableProcessors();
+		}
 		barrier = new CyclicBarrier(THREADS);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
 		guiSemaphore = new CyclicBarrier(THREADS+GUI_THREAD);
@@ -66,19 +67,6 @@ public final class SharedContext {
 	public void releaseUpdateSem(){
 		updateSemaphore.release();
 	}
-	
-	//Lock a ball
-	public void lockBall(final int b1){
-		try {
-			collisionSemaphore.get(b1).acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}		
-	}
-	//Releases a ball
-	public void releaseBall(final int b1){
-		collisionSemaphore.get(b1).release();
-	}
 	/*
 	 * Used to let main thread and worker threads synchronize
 	 */
@@ -101,7 +89,7 @@ public final class SharedContext {
 	// Sets the array of shared bodies
 	public void setBallList(final List<Body> balls) {
 		this.balls = new ArrayList<Body>(balls);
-		initCollisonVector();
+		THREADS = 1002;
 		
 		if(balls.size() % THREADS  != 0) {
 			isOdd = true;
@@ -115,6 +103,9 @@ public final class SharedContext {
 	//Returns how many balls should a SINGLE thread handle.
 	//If the number is odd, one thread gets more ball than the others
 	public int getBallsPerThread(){
+		if(balls.size() < THREADS) {
+			return 1;
+		}
 		if(isOdd){
 			isOdd = false;
 			return (balls.size() / THREADS) + (balls.size() % THREADS);
@@ -127,16 +118,6 @@ public final class SharedContext {
 	}
 	public boolean getStop(){
 		return stop;
-	}
-	/**
-	 * private methods
-	 */
-	private void initCollisonVector() {
-		collisionSemaphore = new Vector<Semaphore>(balls.size());
-		
-		for(int i = 0; i < balls.size(); i++) {
-			collisionSemaphore.add(new Semaphore(SEMAPHORE_PERMITS));
-		}
 	}
 		
 	/**
@@ -157,10 +138,12 @@ public final class SharedContext {
 		return BOUNDS;
 	}
 	
+	//Check if simulation is ended
 	public boolean isEnded() {
 		return isEnded;
 	}
 	
+	//Set the simulation when is ended
 	public void setEnd(boolean b) {
 		isEnded = b;
 	}

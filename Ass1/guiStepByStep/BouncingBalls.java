@@ -29,8 +29,10 @@ public class BouncingBalls {
 		context.setBallList(balls);
 
 		for (int i = 0; i < SharedContext.getWorkers(); i++) {
-			perThread = context.getBallsPerThread();
-			workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
+			if(i < balls.size()) {
+				perThread = context.getBallsPerThread();
+				workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
+			}
 		}
 	}
 	

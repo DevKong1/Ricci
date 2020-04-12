@@ -84,7 +84,7 @@ public class Worker extends Thread {
 							Body.solveCollision(b1, b2);
 						}
 					}
-					// Updates the local ball with it's new values
+					//updates the local ball with it's new values
 					threadBalls.set(i - start, b1);
 				}
 			}
