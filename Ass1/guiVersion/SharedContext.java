@@ -89,7 +89,6 @@ public final class SharedContext {
 	// Sets the array of shared bodies
 	public void setBallList(final List<Body> balls) {
 		this.balls = new ArrayList<Body>(balls);
-		THREADS = 1002;
 		
 		if(balls.size() % THREADS  != 0) {
 			isOdd = true;

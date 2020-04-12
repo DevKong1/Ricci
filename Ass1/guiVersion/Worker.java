@@ -21,7 +21,6 @@ public class Worker extends Thread {
 	public Worker(final String name, final SharedContext context, final int start, final int lastlIndex) {
 		super(name);
 		this.context = context;
-		System.out.println(""+ start + " " + lastlIndex);
 		this.start = start;
 		this.lastIndex = lastlIndex;
 		this.threadBalls = new ArrayList<Body>(context.getBallList().subList(start, lastIndex));
