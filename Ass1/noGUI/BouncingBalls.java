@@ -10,7 +10,7 @@ public class BouncingBalls {
 		/**
 		 * Input variables
 		 */
-		int nBalls = 1000;
+		int nBalls = 5000;
 		int nStep = 1000;
 
 		/**
@@ -25,7 +25,7 @@ public class BouncingBalls {
 		int counter = 0;
 		//the global ball list is created and passed to the shared context
 		List<Body> balls = generateBalls(nBalls, SharedContext.getBounds());
-		context.setBallList(balls);
+		context.init(balls);
 		List<Worker> workers = new ArrayList<Worker>();
 		//Creates threads and splits balls between them
 		for (int i = 0; i < SharedContext.getWorkers(); i++) {

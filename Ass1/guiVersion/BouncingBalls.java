@@ -26,8 +26,8 @@ public class BouncingBalls {
 		int tmp = 0;
 		List<Body> balls = generateBalls(nBalls);
 		// A shared context with which threads will coordinate
-		context.setBallList(balls);
-
+		context.init(balls);
+		
 		for (int i = 0; i < SharedContext.getWorkers(); i++) {
 			if(i < balls.size()) {
 				perThread = context.getBallsPerThread();
@@ -40,9 +40,9 @@ public class BouncingBalls {
 		view = new SimulationViewer(620,620,this);
 	}
 
-	long c = System.currentTimeMillis();
 	
 	public void begin(){
+		long c = System.currentTimeMillis();
 		for (Worker b : workers) {
 			b.start();
 		}

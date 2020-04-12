@@ -74,7 +74,7 @@ public class Worker extends Thread {
 		List<Body> tmp = context.getBallList();
     	
     	//for each assigned ball
-	    for (int i = start; i < lastIndex - 1; i++) {	    	
+	    for (int i = start; i < lastIndex; i++) {	    	
 	    	Body b1 = tmp.get(i);
 	    	
 	    	//for each subsequent ball

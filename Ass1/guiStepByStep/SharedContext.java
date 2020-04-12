@@ -26,18 +26,27 @@ public final class SharedContext {
 	private boolean isOdd;
 	//Number of threads available
 	private List<Body> balls;
-	private final CyclicBarrier barrier;
-	private final Semaphore updateSemaphore;
-	private final CyclicBarrier guiSemaphore;
+	private CyclicBarrier barrier;
+	private Semaphore updateSemaphore;
+	private CyclicBarrier guiSemaphore;
 	
 	// Private constructor for Singleton
 	private SharedContext() {
+	}
+	
+	public void init(final List<Body> balls) {		
 		// To avoid program to be sequential
 		if(Runtime.getRuntime().availableProcessors() < 3) {
 			THREADS= 3;
 		} else {
 			THREADS = Runtime.getRuntime().availableProcessors();
 		}
+		
+		setBallList(balls);
+		if(THREADS > getBallList().size()) {
+			THREADS = getBallList().size();
+		}
+		
 		barrier = new CyclicBarrier(THREADS);
 		updateSemaphore = new Semaphore(SEMAPHORE_PERMITS);
 		guiSemaphore = new CyclicBarrier(THREADS+GUI_THREAD);
@@ -103,9 +112,6 @@ public final class SharedContext {
 	//Returns how many balls should a SINGLE thread handle.
 	//If the number is odd, one thread gets more ball than the others
 	public int getBallsPerThread(){
-		if(balls.size() < THREADS) {
-			return 1;
-		}
 		if(isOdd){
 			isOdd = false;
 			return (balls.size() / THREADS) + (balls.size() % THREADS);
