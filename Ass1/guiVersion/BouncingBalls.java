@@ -29,10 +29,8 @@ public class BouncingBalls {
 		context.init(balls);
 		
 		for (int i = 0; i < SharedContext.getWorkers(); i++) {
-			if(i < balls.size()) {
-				perThread = context.getBallsPerThread();
-				workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
-			}
+			perThread = context.getBallsPerThread();
+			workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
 		}
 	}
 	//When this class is initiated by this method, it launches the GUI.

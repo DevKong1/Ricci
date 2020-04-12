@@ -29,10 +29,8 @@ public class BouncingBalls {
 		List<Worker> workers = new ArrayList<Worker>();
 		//Creates threads and splits balls between them
 		for (int i = 0; i < SharedContext.getWorkers(); i++) {
-			if(i < balls.size()) {
-				perThread = context.getBallsPerThread();
-				workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
-			}
+			perThread = context.getBallsPerThread();
+			workers.add(new Worker("Worker-" + i, context, tmp, tmp += perThread));
 		}
 		long c = System.currentTimeMillis();
 		if (nStep > 0) {
